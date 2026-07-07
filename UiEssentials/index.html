@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Character Counter — Analyze your text in real-time</title>
+<meta name="description" content="Count characters, words, and sentences in your text. Analyze letter density, set a character limit, and estimate reading time." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <main>
+      <h1 class="main-heading">Analyze your text<br />in real-time.</h1>
+
+      <section class="text-input" aria-labelledby="editor-label">
+        <label id="editor-label" class="visually-hidden" for="text-input">Enter your text</label>
+        <textarea
+          id="text-input"
+          class="text-input__field"
+          placeholder="Start typing here… (or paste your text anywhere on this page)"
+          rows="6"
+        ></textarea>
+
+        <div class="text-input__footer">
+          <div class="settings">
+            <label class="checkbox">
+              <input type="checkbox" id="exclude-spaces" />
+              <span class="checkbox__box" aria-hidden="true"></span>
+              Exclude Spaces
+            </label>
+
+            <label class="checkbox">
+              <input type="checkbox" id="limit-toggle" />
+              <span class="checkbox__box" aria-hidden="true"></span>
+              Set Character Limit
+            </label>
+
+            <label class="limit-input" id="limit-input-wrap" hidden>
+              <span class="visually-hidden">Character limit</span>
+              <input type="number" id="limit-input" min="1" value="300" />
+            </label>
+          </div>
+
+          <p class="reading-time">
+            Approx. reading time: <span id="reading-time">&lt;1</span> minute<span id="reading-time-plural">s</span>
+          </p>
+        </div>
+      </section>
+
+      <p class="limit-warning" id="limit-warning" role="alert" hidden>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="10" cy="13.6" r="1" fill="currentColor"/></svg>
+        Your text exceeds the character limit by <span id="limit-exceeded-count">0</span> characters.
+      </p>
+
+      <section class="stats" aria-label="Text statistics">
+        <div class="stat-card stat-card--purple">
+          <p class="stat-card__number" id="char-count">0</p>
+          <p class="stat-card__label">Total Characters</p>
+        </div>
+        <div class="stat-card stat-card--orange">
+          <p class="stat-card__number" id="word-count">0</p>
+          <p class="stat-card__label">Word Count</p>
+        </div>
+        <div class="stat-card stat-card--coral">
+          <p class="stat-card__number" id="sentence-count">0</p>
+          <p class="stat-card__label">Sentence Count</p>
+        </div>
+      </section>
+
+      <section class="density" aria-label="Letter density">
+        <h2 class="density__heading">Letter Density</h2>
+
+        <p class="density__empty" id="density-empty">No characters found. Start typing to see letter density.</p>
+
+        <ul class="density__list" id="density-list" hidden></ul>
+
+        <button class="density__toggle" id="density-toggle" type="button" hidden>
+          See more
+          <svg width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true"><path d="M1 1.5 6 6.5l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
