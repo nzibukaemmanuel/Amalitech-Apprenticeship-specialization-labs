@@ -1,4 +1,3 @@
-
 :root {
   --purple: #d3a0fa;
   --purple-track: #4a3b6b;
@@ -8,7 +7,7 @@
   --coral-track: #6b4438;
   --card-text: #12131a;
 
-  --bg: #f2f2f7;
+  --bg: #f4f4f8;
   --surface: #ffffff;
   --border: #e2e1eb;
   --text: #12131a;
@@ -26,16 +25,77 @@
   color-scheme: light;
 }
 
+.brand-logo {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    overflow: hidden;
+    border-radius: 1px;
+}
+
+
+/* Shared half style */
+.brand-logo-left,
+.brand-logo-right {
+    width: 50%;
+    height: 100%;
+    position: relative;
+}
+
+
+/* LEFT SIDE
+   Purple square with white half circle
+*/
+.brand-logo-left {
+    background: var(--purple);
+    overflow: hidden;
+}
+
+
+.brand-logo-left::after {
+    content: "";
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background: var(--bg);
+    border-radius: 50%;
+    top: 50%;
+    left: 100%;
+    transform: translate(-50%, -50%);
+}
+
+
+/* RIGHT SIDE
+   Inverted mirror
+*/
+.brand-logo-right {
+    /*background: var(--bg);*/
+    overflow: hidden;
+}
+
+
+.brand-logo-right::after {
+    content: "";
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background: var(--purple);
+    border-radius: 50%;
+    top: 50%;
+    right: 100%;
+    transform: translate(50%, -50%);
+}
+
 :root[data-theme="dark"] {
-  --bg: #13151b;
-  --surface: #1e2029;
-  --border: #2c2e3a;
-  --text: #f4f2ff;
-  --text-muted: #a8a7bb;
-  --input-bg: #191a22;
-  --track-bg: #2c2e3a;
-  --logo-bg: #ffffff;
-  --logo-fg: #13151b;
+  --bg: #131319;
+  --surface: #1c1c24;
+  --border: #2c2c37;
+  --text: #f5f4fa;
+  --text-muted: #9695a8;
+  --input-bg: #1a1a22;
+  --track-bg: #2c2c37;
+  --logo-bg: #d3a0fa;
+  --logo-fg: #12131a;
   --shadow: none;
 
   color-scheme: dark;
@@ -46,7 +106,10 @@ html { color-scheme: light dark; }
 body {
   margin: 0;
   font-family: "DM Sans", system-ui, sans-serif;
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.035) 1px, transparent 0);
+  background-size: 3px 3px;
   color: var(--text);
   transition: background-color .25s ease, color .25s ease;
   -webkit-font-smoothing: antialiased;
@@ -69,7 +132,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 
 .page {
-  max-width: 730px;
+  max-width: 760px;
   margin: 0 auto;
   padding: 32px 24px 96px;
 }
@@ -253,25 +316,53 @@ ul { list-style: none; margin: 0; padding: 0; }
   padding: 20px 24px;
   color: var(--card-text);
   background-repeat: no-repeat;
-  background-position: right -10px bottom -20px;
-  background-size: 90px;
+  background-position: right -6px bottom -14px;
+  background-size: 92px 92px;
   position: relative;
   overflow: hidden;
 }
-.stat-card--purple { background-color: var(--purple); }
-.stat-card--orange { background-color: var(--orange); }
-.stat-card--coral  { background-color: var(--coral); }
+.stat-card--purple {
+  background-color: var(--purple);
+  background-image: radial-gradient(rgba(18, 19, 26, 0.22) 2.6px, transparent 2.6px);
+  background-size: 14px 14px;
+  background-position: right -4px bottom -10px;
+  -webkit-mask-image: linear-gradient(#000 0 0);
+}
+.stat-card--purple::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 100% 100%, transparent 55%, var(--purple) 56%);
+}
+.stat-card--orange {
+  background-color: var(--orange);
+  background-image:
+    linear-gradient(45deg, rgba(18, 19, 26, 0.16) 25%, transparent 25%, transparent 75%, rgba(18, 19, 26, 0.16) 75%),
+    linear-gradient(45deg, rgba(18, 19, 26, 0.16) 25%, transparent 25%, transparent 75%, rgba(18, 19, 26, 0.16) 75%);
+  background-size: 16px 16px;
+  background-position: right -6px bottom -12px, right 2px bottom -4px;
+}
+.stat-card--coral {
+  background-color: var(--coral);
+  background-image:
+    linear-gradient(rgba(18, 19, 26, 0.18) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, rgba(18, 19, 26, 0.18) 1.5px, transparent 1.5px);
+  background-size: 12px 12px;
+  background-position: right -6px bottom -14px;
+}
 
 .stat-card__number {
   font-size: clamp(2.25rem, 6vw, 3rem);
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.02em;
+  position: relative;
 }
 .stat-card__label {
   margin-top: 10px;
   font-size: .9375rem;
   font-weight: 500;
+  position: relative;
 }
 
 
@@ -281,7 +372,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 .density__heading {
   font-size: 1.25rem;
   font-weight: 700;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 .density__empty {
   color: var(--text-muted);
@@ -296,16 +387,20 @@ ul { list-style: none; margin: 0; padding: 0; }
 
 .density__row {
   display: grid;
-  grid-template-columns: 22px 1fr 60px;
+  grid-template-columns: 20px 1fr 76px;
   align-items: center;
   gap: 12px;
   font-size: .875rem;
 }
 
-.density__letter { font-weight: 600; text-transform: uppercase; }
+.density__letter {
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text);
+}
 
 .density__track {
-  height: 14px;
+  height: 8px;
   border-radius: 999px;
   background: var(--track-bg);
   overflow: hidden;
@@ -328,7 +423,7 @@ ul { list-style: none; margin: 0; padding: 0; }
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-top: 20px;
+  margin-top: 16px;
   background: none;
   border: none;
   color: var(--text-muted);
