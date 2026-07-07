@@ -25,6 +25,160 @@
   color-scheme: light;
 }
 
+.stat-card {
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  color: var(--card-text);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* PURPLE — dot grid */
+.stat-card--purple {
+  background-color: var(--purple);
+}
+.stat-card--purple::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(18, 19, 26, 0.22) 2.6px, transparent 2.6px);
+  background-size: 14px 14px;
+  background-repeat: repeat;
+  -webkit-mask-image: linear-gradient(to left, black 35%, transparent 75%);
+          mask-image: linear-gradient(to left, black 35%, transparent 75%);
+}
+
+/* ORANGE — checkerboard */
+.stat-card--orange {
+  background-color: var(--orange);
+}
+.stat-card--orange::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(45deg, rgba(18, 19, 26, 0.16) 25%, transparent 25%, transparent 75%, rgba(18, 19, 26, 0.16) 75%),
+    linear-gradient(45deg, rgba(18, 19, 26, 0.16) 25%, transparent 25%, transparent 75%, rgba(18, 19, 26, 0.16) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 8px 8px;
+  background-repeat: repeat;
+  -webkit-mask-image: linear-gradient(to left, black 35%, transparent 75%);
+          mask-image: linear-gradient(to left, black 35%, transparent 75%);
+}
+
+/* CORAL — grid lines */
+.stat-card--coral {
+  background-color: var(--coral);
+}
+.stat-card--coral::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(18, 19, 26, 0.18) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, rgba(18, 19, 26, 0.18) 1.5px, transparent 1.5px);
+  background-size: 12px 12px;
+  background-repeat: repeat;
+  -webkit-mask-image: linear-gradient(to left, black 35%, transparent 75%);
+          mask-image: linear-gradient(to left, black 35%, transparent 75%);
+}
+
+.stat-card__number {
+  font-size: clamp(2.25rem, 6vw, 3rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  position: relative;
+  z-index: 1;
+}
+.stat-card__label {
+  margin-top: 10px;
+  font-size: .9375rem;
+  font-weight: 500;
+  position: relative;
+  z-index: 1;
+}
+
+
+.density {
+  margin-top: 40px;
+}
+.density__heading {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.density__panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.density__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.density__row {
+  display: grid;
+  grid-template-columns: 20px 1fr 76px;
+  align-items: center;
+  gap: 12px;
+  font-size: .875rem;
+  padding: 8px 0;
+}
+
+.density__letter {
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.density__track {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--track-bg);
+  overflow: hidden;
+}
+.density__fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--purple) 0%, #8b5cf6 100%);
+  min-width: 4px;
+}
+
+.density__meta {
+  text-align: right;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.density__toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-weight: 600;
+  cursor: pointer;
+}
+.density__toggle:hover { color: var(--text); }
+.density__toggle.is-expanded svg { transform: rotate(180deg); }
+
+
 .brand-logo {
     width: 35px;
     height: 35px;
