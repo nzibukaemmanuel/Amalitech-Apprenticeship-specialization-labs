@@ -68,15 +68,15 @@
 
       <section class="stats" aria-label="Text statistics">
         <div class="stat-card stat-card--purple">
-          <p class="stat-card__number" id="char-count">0</p>
+          <p class="stat-card__number" id="char-count">559</p>
           <p class="stat-card__label">Total Characters</p>
         </div>
         <div class="stat-card stat-card--orange">
-          <p class="stat-card__number" id="word-count">0</p>
+          <p class="stat-card__number" id="word-count">83</p>
           <p class="stat-card__label">Word Count</p>
         </div>
         <div class="stat-card stat-card--coral">
-          <p class="stat-card__number" id="line-count">0</p>
+          <p class="stat-card__number" id="line-count">4</p>
           <p class="stat-card__label">Line Count</p>
         </div>
       </section>
@@ -84,14 +84,35 @@
       <section class="density" aria-label="Letter density">
         <h2 class="density__heading">Letter Density</h2>
 
-        <p class="density__empty" id="density-empty">No characters found. Start typing to see letter density.</p>
-
-        <ul class="density__list" id="density-list" hidden></ul>
-
-        <button class="density__toggle" id="density-toggle" type="button" hidden>
-          See more
-          <svg width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden="true"><path d="M1 1.5 6 6.5l5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
+        <div class="density__panel">
+          <ul class="density__list" id="density-list">
+            <li class="density__row">
+              <span class="density__letter">e</span>
+              <span class="density__track"><span class="density__fill" style="width: 18%"></span></span>
+              <span class="density__meta">18 (18%)</span>
+            </li>
+            <li class="density__row">
+              <span class="density__letter">a</span>
+              <span class="density__track"><span class="density__fill" style="width: 14%"></span></span>
+              <span class="density__meta">14 (14%)</span>
+            </li>
+            <li class="density__row">
+              <span class="density__letter">i</span>
+              <span class="density__track"><span class="density__fill" style="width: 12%"></span></span>
+              <span class="density__meta">12 (12%)</span>
+            </li>
+            <li class="density__row">
+              <span class="density__letter">o</span>
+              <span class="density__track"><span class="density__fill" style="width: 11%"></span></span>
+              <span class="density__meta">11 (11%)</span>
+            </li>
+            <li class="density__row">
+              <span class="density__letter">t</span>
+              <span class="density__track"><span class="density__fill" style="width: 9%"></span></span>
+              <span class="density__meta">9 (9%)</span>
+            </li>
+          </ul>
+        </div>
       </section>
     </main>
   </div>
