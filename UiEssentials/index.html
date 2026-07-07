@@ -11,7 +11,22 @@
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+<div class="page">
+    <header class="site-header">
+      <a class="logo" href="#" aria-label="Character Counter home">
+          <rect width="32" height="32" rx="9" fill="var(--logo-bg)"/>
+          <path d="M20.2 12.3c-.7-.8-1.7-1.3-2.9-1.3-2.4 0-4.1 1.9-4.1 5s1.7 5 4.1 5c1.3 0 2.3-.5 3-1.5l1.4 1.1c-1 1.4-2.5 2.2-4.4 2.2-3.5 0-6-2.8-6-6.8s2.5-6.8 6-6.8c1.8 0 3.3.7 4.3 2l-1.4 1.1Z" fill="var(--logo-fg)"/>
+        </svg>
+        <span>Character&nbsp;Counter</span>
+      </a>
 
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark and light theme">
+        <svg class="icon-sun" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="10" cy="10" r="4" stroke="currentColor" stroke-width="1.6"/>
+          <path d="M10 1.5v2M10 16.5v2M18.5 10h-2M3.5 10h-2M15.6 4.4l-1.4 1.4M5.8 14.2l-1.4 1.4M15.6 15.6l-1.4-1.4M5.8 5.8 4.4 4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </header>
     <main>
       <h1 class="main-heading">Analyze your text<br />in real-time.</h1>
 
@@ -22,7 +37,7 @@
           class="text-input__field"
           placeholder="Start typing here… (or paste your text anywhere on this page)"
           rows="6"
-        ></textarea>
+        >Figma Ant Design (AntD) is a UI kit mirroring the Ant Design React framework to bridge design and code. Its role is to speed up development by offering thousands of pre-built, production-ready components—like tables and forms—that map one-to-one with code. By using global design tokens and responsive auto-layouts, it eliminates developer hand-off friction, maintains perfect enterprise-level consistency, and allows instant global theme updates. Ultimately, it ensures that what is designed in Figma matches what is built in code accurately and efficiently.</textarea>
 
         <div class="text-input__footer">
           <div class="settings">
@@ -49,11 +64,6 @@
           </p>
         </div>
       </section>
-
-      <p class="limit-warning" id="limit-warning" role="alert" hidden>
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="10" cy="13.6" r="1" fill="currentColor"/></svg>
-        Your text exceeds the character limit by <span id="limit-exceeded-count">0</span> characters.
-      </p>
 
       <section class="stats" aria-label="Text statistics">
         <div class="stat-card stat-card--purple">
