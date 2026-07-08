@@ -1,4 +1,3 @@
-
 :root {
   --bg: #12131a;
   --purple: #cf96fe;
@@ -7,6 +6,10 @@
   --surface: #1d1f27;
   --text-main: #ffffff;
   --text-muted: #9ba1b0;
+
+  
+  --text-primary: #ffffff;
+  --bg-opacity: 0.16;
 }
 
 * {
@@ -14,6 +17,7 @@
   margin: 0;
   padding: 0;
 }
+
 
 body {
   background-color: var(--bg);
@@ -139,7 +143,7 @@ textarea {
   resize: none;
   color: var(--text-muted);
   font-family: inherit;
-  font-size: 14px;
+  font-size: 17px;
   line-height: 1.5;
   outline: none;
 }
@@ -227,7 +231,7 @@ textarea {
   letter-spacing: -0.3px;
 }
 
-/* Color Identity Configuration */
+
 .card-purple { background-color: var(--purple); color: #12131a; }
 .card-orange { background-color: var(--orange); color: #12131a; }
 .card-coral  { background-color: var(--coral); color: #12131a; }
@@ -241,6 +245,92 @@ textarea {
   width: auto;
   pointer-events: none;
   z-index: 1;
+}
+
+.pattern1 {
+    position: absolute;
+    top: 0%;
+    left: 85%;
+    transform: translateX(-50%);
+    height: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: var(--text-primary);
+    opacity: var(--bg-opacity);
+}
+
+
+
+.circle-grid {
+    position: absolute;
+    width: 125%;
+    height: 125%;
+    left: -12.5%;
+    top: -12.5%;
+    display: grid;
+    grid-template-columns:repeat(4, 1fr);
+    grid-template-rows:repeat(4, 1fr);
+    gap: 4px;
+}
+
+
+
+.circle-grid span {
+    background: var(--purple);
+    border-radius: 50%;
+}
+
+.pattern2 {
+    position: absolute;
+    top: 0;
+    left: 85%;
+    transform: translateX(-50%);
+    height: 100%;
+    aspect-ratio: 1;
+    display: grid;
+    grid-template-columns:repeat(3, 1fr);
+    grid-template-rows:repeat(3, 1fr);
+}
+
+
+
+.pattern2 span {
+    background: transparent;
+}
+
+
+
+.pattern2 span:nth-child(1),
+.pattern2 span:nth-child(3),
+.pattern2 span:nth-child(5),
+.pattern2 span:nth-child(7),
+.pattern2 span:nth-child(9) {
+
+    background: var(--text-primary);
+    opacity: var(--bg-opacity);
+}
+
+.pattern3 {
+    --offset: 90%;
+    --gap: 1px;
+    position: absolute;
+    top: -12.5%;
+    left: 85%;
+    transform: translateX(-40%);
+    height: 125%;
+    aspect-ratio: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--gap);
+    overflow: hidden;
+    background: var(--text-primary);
+    opacity: var(--bg-opacity);
+    gap: 8px;
+}
+
+.pattern3 .cell {
+    background: var(--coral);
+    border-radius: 15%;
 }
 
 
