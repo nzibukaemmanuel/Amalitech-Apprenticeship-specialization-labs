@@ -1,120 +1,119 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Character Counter — Analyze your text in real-time</title>
-<meta name="description" content="Count characters, words, and lines in your text. Analyze letter density, set a character limit, and estimate reading time." />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Character Counter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="page">
-    <header class="site-header">
-      <a class="logo" href="#" aria-label="Character Counter home">
-        <div class="brand-logo">
-                <div class="brand-logo-left"></div>
-                <div class="brand-logo-right"></div>
-            </div>
-        <span>Character&nbsp;Counter</span>
-      </a>
 
+  <div class="container">
+    <header class="header">
+      <div class="logo-area">
+        <div class="brand-logo">
+          <div class="brand-logo-left"></div>
+          <div class="brand-logo-right"></div>
+        </div>
+        <span class="brand-name">Character Counter</span>
+      </div>
       <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark and light theme">
-        <svg class="icon-sun" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <circle cx="10" cy="10" r="4" stroke="currentColor" stroke-width="1.6"/>
-          <path d="M10 1.5v2M10 16.5v2M18.5 10h-2M3.5 10h-2M15.6 4.4l-1.4 1.4M5.8 14.2l-1.4 1.4M15.6 15.6l-1.4-1.4M5.8 5.8 4.4 4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2"></path>
+          <path d="M12 20v2"></path>
+          <path d="M4.93 4.93l1.41 1.41"></path>
+          <path d="M17.66 17.66l1.41 1.41"></path>
+          <path d="M2 12h2"></path>
+          <path d="M20 12h2"></path>
+          <path d="M6.34 17.66l-1.41 1.41"></path>
+          <path d="M19.07 4.93l-1.41 1.41"></path>
         </svg>
       </button>
     </header>
+
     <main>
-      <h1 class="main-heading">Analyze your text<br />in real-time.</h1>
+      <h1 class="title">Analyze your text<br>in real-time.</h1>
 
-      <section class="text-input" aria-labelledby="editor-label">
-        <label id="editor-label" class="visually-hidden" for="text-input">Enter your text</label>
-        <textarea
-          id="text-input"
-          class="text-input__field"
-          placeholder="Start typing here… (or paste your text anywhere on this page)"
-          rows="6"
-        >Figma Ant Design (AntD) is a UI kit mirroring the Ant Design React framework to bridge design and code. Its role is to speed up development by offering thousands of pre-built, production-ready components—like tables and forms—that map one-to-one with code. By using global design tokens and responsive auto-layouts, it eliminates developer hand-off friction, maintains perfect enterprise-level consistency, and allows instant global theme updates. Ultimately, it ensures that what is designed in Figma matches what is built in code accurately and efficiently.</textarea>
+      <div class="textarea-container">
+        <textarea>Design is the silent ambassador of your brand. Simplicity is key to effective communication, creating clarity in every interaction. A great design transforms complex ideas into elegant solutions, making them easy to understand. It blends aesthetics and functionality seamlessly.</textarea>
+      </div>
 
-        <div class="text-input__footer">
-          <div class="settings">
-            <label class="checkbox">
-              <input type="checkbox" id="exclude-spaces" />
-              <span class="checkbox__box" aria-hidden="true"></span>
-              Exclude Spaces
-            </label>
-
-            <label class="checkbox">
-              <input type="checkbox" id="limit-toggle" />
-              <span class="checkbox__box" aria-hidden="true"></span>
-              Set Character Limit
-            </label>
-
-            <label class="limit-input" id="limit-input-wrap" hidden>
-              <span class="visually-hidden">Character limit</span>
-              <input type="number" id="limit-input" min="1" value="300" />
-            </label>
-          </div>
-
-          <p class="reading-time">
-            Approx. reading time: <span id="reading-time">&lt;1</span> minute<span id="reading-time-plural">s</span>
-          </p>
+      <div class="controls-row">
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox">
+            <span class="custom-checkbox"></span>
+            Exclude Spaces
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox">
+            <span class="custom-checkbox"></span>
+            Set Character Limit
+          </label>
         </div>
-      </section>
+        <div class="reading-time">
+          Approx. reading time: &lt;1 minute
+        </div>
+      </div>
 
-      <section class="stats" aria-label="Text statistics">
-  <div class="stat-card stat-card--purple">
-    <p class="stat-card__number" id="char-count">559</p>
-    <p class="stat-card__label">Total Characters</p>
-  </div>
-  <div class="stat-card stat-card--orange">
-    <p class="stat-card__number" id="word-count">83</p>
-    <p class="stat-card__label">Word Count</p>
-  </div>
-  <div class="stat-card stat-card--coral">
-    <p class="stat-card__number" id="line-count">04</p>
-    <p class="stat-card__label">Sentence Count</p>
-  </div>
-</section>
+      <div class="metrics-grid">
+        <div class="card card-purple">
+          <div class="card-content">
+            <div class="card-number">508</div>
+            <div class="card-label">Total Characters</div>
+          </div>
+        </div>
 
-      <section class="density" aria-label="Letter density">
-        <h2 class="density__heading">Letter Density</h2>
+        <div class="card card-orange">
+          <div class="card-content">
+            <div class="card-number">86</div>
+            <div class="card-label">Word Count</div>
+          </div>
+          
+        </div>
 
-        <div class="density__panel">
-  <ul class="density__list" id="density-list">
-    <li class="density__row">
-      <span class="density__letter">e</span>
-      <span class="density__track"><span class="density__fill" style="width: 40.85%;"></span></span>
-      <span class="density__meta">59 (40.85%)</span>
-    </li>
-    <li class="density__row">
-      <span class="density__letter">i</span>
-      <span class="density__track"><span class="density__fill" style="width: 9.63%;"></span></span>
-      <span class="density__meta">41 (9.63%)</span>
-    </li>
-    <li class="density__row">
-      <span class="density__letter">t</span>
-      <span class="density__track"><span class="density__fill" style="width: 8.92%;"></span></span>
-      <span class="density__meta">38 (8.92%)</span>
-    </li>
-    <li class="density__row">
-      <span class="density__letter">o</span>
-      <span class="density__track"><span class="density__fill" style="width: 7.51%;"></span></span>
-      <span class="density__meta">32 (7.51%)</span>
-    </li>
-    <li class="density__row">
-      <span class="density__letter">a</span>
-      <span class="density__track"><span class="density__fill" style="width: 6.57%;"></span></span>
-      <span class="density__meta">28 (6.57%)</span>
-    </li>
-  </ul>
-</div>
+        <div class="card card-coral">
+          <div class="card-content">
+            <div class="card-number">06</div>
+            <div class="card-label">Line Count</div>
+          </div>
+          
+        </div>
+      </div>
+
+      <section class="density-section">
+        <h2>Letter Density</h2>
+        
+        <div class="density-row">
+          <span class="letter">E</span>
+          <div class="progress-container">
+            <div class="progress-bar" style="width: 13.85%;"></div>
+          </div>
+          <span class="stats">59 (13.85%)</span>
+        </div>
+
+        <div class="density-row">
+          <span class="letter">I</span>
+          <div class="progress-container">
+            <div class="progress-bar" style="width: 9.63%;"></div>
+          </div>
+          <span class="stats">41 (9.63%)</span>
+        </div>
+
+        <div class="density-row">
+          <span class="letter">T</span>
+          <div class="progress-container">
+            <div class="progress-bar" style="width: 8.92%;"></div>
+          </div>
+          <span class="stats">38 (8.92%)</span>
+        </div>
       </section>
     </main>
   </div>
+
 </body>
 </html>
