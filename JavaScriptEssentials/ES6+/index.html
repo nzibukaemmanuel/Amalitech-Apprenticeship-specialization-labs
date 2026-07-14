@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Character Counter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <header class="header">
+      <div class="logo-area">
+        <div class="brand-logo">
+          <div class="brand-logo-left"></div>
+          <div class="brand-logo-right"></div>
+        </div>
+        <span class="brand-name">Character Counter</span>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark and light theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2"></path>
+          <path d="M12 20v2"></path>
+          <path d="M4.93 4.93l1.41 1.41"></path>
+          <path d="M17.66 17.66l1.41 1.41"></path>
+          <path d="M2 12h2"></path>
+          <path d="M20 12h2"></path>
+          <path d="M6.34 17.66l-1.41 1.41"></path>
+          <path d="M19.07 4.93l-1.41 1.41"></path>
+        </svg>
+      </button>
+    </header>
+
+    <main>
+      <h1 class="title">Analyze your text<br>in real-time.</h1>
+
+      <div class="textarea-container">
+        <textarea id="text-input" placeholder="Start typing or paste your text here...">Design is the silent ambassador of your brand. Simplicity is key to effective communication, creating clarity in every interaction. A great design transforms complex ideas into elegant solutions, making them easy to understand. It blends aesthetics and functionality seamlessly.</textarea>
+      </div>
+
+      <div class="controls-row">
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="exclude-spaces">
+            <span class="custom-checkbox"></span>
+            Exclude Spaces
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="enable-char-limit">
+            <span class="custom-checkbox"></span>
+            Set Character Limit
+          </label>
+          <input type="number" id="char-limit-input" class="char-limit-input" min="1" placeholder="e.g. 200" style="display:none;">
+        </div>
+        <div class="reading-time">
+          Approx. reading time: <span id="reading-time">&lt;1 minute</span>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+
+        <div class="card card-purple" id="chars-card">
+          <div class="card-content">
+            <div class="card-number" id="total-characters">0</div>
+            <div class="card-label">Total Characters</div>
+          </div>
+          <div class="pattern1">
+            <div class="circle-grid">
+              <span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-orange">
+          <div class="card-content">
+            <div class="card-number" id="word-count">0</div>
+            <div class="card-label">Word Count</div>
+          </div>
+          <div class="pattern2">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+
+        <div class="card card-coral">
+          <div class="card-content">
+            <div class="card-number" id="line-count">0</div>
+            <div class="card-label">Line Count</div>
+          </div>
+          <div class="pattern3">
+            <span class="cell"></span>
+            <span class="cell"></span>
+            <span class="cell"></span>
+            <span class="cell"></span>
+            <span class="cell"></span>
+            <span class="cell"></span>
+            <span class="cell"></span>
+            <span class="cell"></span>
+            <span class="cell"></span>
+          </div>
+        </div>
+
+      </div>
+
+      <section class="density-section">
+        <h2>Letter Density</h2>
+        <div class="density-list" id="density-list"></div>
+      </section>
+    </main>
+  </div>
+  <script src="main.js"></script>
+
+</body>
+</html>
