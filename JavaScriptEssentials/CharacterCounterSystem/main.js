@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function () {
     lineCountEl.textContent = lineText;
     readingTimeEl.textContent = calcReadingTime(words);
 
-    // Over-limit visual warning
+    
     if (enableLimitBox.checked) {
       var activeLimit = parseInt(limitInput.value, 10);
       var overLimit = !isNaN(activeLimit) && activeLimit > 0 && text.length >= activeLimit;
