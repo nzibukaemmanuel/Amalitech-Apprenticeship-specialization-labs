@@ -10,14 +10,15 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
   <div class="container">
     <header class="header">
       <div class="logo-area">
-        <div class="brand-logo">
-          <div class="brand-logo-left"></div>
-          <div class="brand-logo-right"></div>
-        </div>
+        <button class="brand-logo-button" type="button" aria-label="Character Counter home" title="Character Counter">
+          <div class="brand-logo" aria-hidden="true">
+            <div class="brand-logo-left"></div>
+            <div class="brand-logo-right"></div>
+          </div>
+        </button>
         <span class="brand-name">Character Counter</span>
       </div>
       <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark and light theme">
@@ -35,37 +36,40 @@
       </button>
     </header>
 
-    <main>
+    <main id="main-content">
       <h1 class="title">Analyze your text<br>in real-time.</h1>
 
       <div class="textarea-container">
-        <textarea>Design is the silent ambassador of your brand. Simplicity is key to effective communication, creating clarity in every interaction. A great design transforms complex ideas into elegant solutions, making them easy to understand. It blends aesthetics and functionality seamlessly.</textarea>
+        <label class="sr-only" for="text-input">Text to analyze</label>
+        <textarea id="text-input" placeholder="Start typing or paste your text here...">Design is the silent ambassador of your brand. Simplicity is key to effective communication, creating clarity in every interaction. A great design transforms complex ideas into elegant solutions, making them easy to understand. It blends aesthetics and functionality seamlessly.</textarea>
       </div>
 
       <div class="controls-row">
-        <div class="checkbox-group">
-          <label class="checkbox-label">
-            <input type="checkbox">
-            <span class="custom-checkbox"></span>
+        <div class="checkbox-group" role="group" aria-label="Analysis options">
+          <label class="checkbox-label" for="exclude-spaces">
+            <input type="checkbox" id="exclude-spaces">
+            <span class="custom-checkbox" aria-hidden="true"></span>
             Exclude Spaces
           </label>
-          <label class="checkbox-label">
-            <input type="checkbox">
-            <span class="custom-checkbox"></span>
+          <label class="checkbox-label" for="enable-char-limit">
+            <input type="checkbox" id="enable-char-limit" aria-controls="char-limit-input" aria-expanded="false">
+            <span class="custom-checkbox" aria-hidden="true"></span>
             Set Character Limit
           </label>
+          <label class="sr-only" for="char-limit-input">Character limit</label>
+          <input type="number" id="char-limit-input" class="char-limit-input" min="1" placeholder="e.g. 200" aria-describedby="limit-hint" style="display:none;">
+          <span id="limit-hint" class="sr-only">Only appears when the character limit option is selected.</span>
         </div>
-        <div class="reading-time">
-          Approx. reading time: &lt;1 minute
-        </div>
+        <p class="reading-time" aria-live="polite">
+          Approx. reading time: <span id="reading-time">&lt;1 minute</span>
+        </p>
       </div>
 
-      <div class="metrics-grid">
+      <div class="metrics-grid" aria-label="Text statistics">
 
-        
-        <div class="card card-purple">
-          <div class="card-content">
-            <div class="card-number">508</div>
+        <div class="card card-purple" id="chars-card">
+          <div class="card-content" aria-live="polite" aria-atomic="true">
+            <div class="card-number" id="total-characters">0</div>
             <div class="card-label">Total Characters</div>
           </div>
           <div class="pattern1">
@@ -78,10 +82,9 @@
           </div>
         </div>
 
-        
         <div class="card card-orange">
-          <div class="card-content">
-            <div class="card-number">86</div>
+          <div class="card-content" aria-live="polite" aria-atomic="true">
+            <div class="card-number" id="word-count">0</div>
             <div class="card-label">Word Count</div>
           </div>
           <div class="pattern2">
@@ -97,10 +100,9 @@
           </div>
         </div>
 
-      
         <div class="card card-coral">
-          <div class="card-content">
-            <div class="card-number">06</div>
+          <div class="card-content" aria-live="polite" aria-atomic="true">
+            <div class="card-number" id="line-count">0</div>
             <div class="card-label">Line Count</div>
           </div>
           <div class="pattern3">
@@ -118,31 +120,33 @@
 
       </div>
 
-      <section class="density-section">
-        <h2>Letter Density</h2>
-
-        <div class="density-row">
-          <span class="letter">E</span>
-          <div class="progress-container">
-            <div class="progress-bar" style="width: 25.85%;"></div>
+      <section class="density-section" aria-labelledby="density-heading">
+        <h2 id="density-heading">Letter Density</h2>
+        <div class="density-list" id="density-list">
+          <div class="density-row">
+            <span class="letter">E</span>
+            <div class="progress-container" aria-hidden="true">
+              <div class="progress-bar" style="width: 13.85%"></div>
+            </div>
+            <span class="stats">59(13.85%)</span>
           </div>
-          <span class="stats">59 (18.85%)</span>
+          <div class="density-row">
+            <span class="letter">I</span>
+            <div class="progress-container" aria-hidden="true">
+              <div class="progress-bar" style="width: 9.63%"></div>
+            </div>
+            <span class="stats">41(9.63%)</span>
+          </div>
+          <div class="density-row">
+            <span class="letter">T</span>
+            <div class="progress-container" aria-hidden="true">
+              <div class="progress-bar" style="width: 8.92%"></div>
+            </div>
+            <span class="stats">38(8.92%)</span>
+          </div>
         </div>
-
-        <div class="density-row">
-          <span class="letter">I</span>
-          <div class="progress-container">
-            <div class="progress-bar" style="width: 9.63%;"></div>
-          </div>
-          <span class="stats">41 (9.63%)</span>
-        </div>
-
-        <div class="density-row">
-          <span class="letter">T</span>
-          <div class="progress-container">
-            <div class="progress-bar" style="width: 8.92%;"></div>
-          </div>
-          <span class="stats">38 (8.92%)</span>
+        <div class="density-footer">
+          <button class="toggle-density" id="toggle-density" type="button" aria-expanded="false">Show more</button>
         </div>
       </section>
     </main>
