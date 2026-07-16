@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var densityList      = document.getElementById('density-list');
 
   var themeToggle      = document.getElementById('theme-toggle');
+  var toggleDensityBtn = document.getElementById('toggle-density');
 
   var AVG_READING_WPM  = 200; 
   var alphabet        = 'abcdefghijklmnopqrstuvwxyz'.split('');
@@ -128,9 +129,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var density = calcLetterDensity(text);
     var rows = [];
+    var letterCount = text.replace(/[^a-z]/gi, '').length;
+    var shouldExpand = densityList.classList.contains('expanded');
+    var visibleRows = shouldExpand ? density : density.slice(0, 6);
 
-    for (var k = 0; k < density.length; k++) {
-      var item = density[k];
+    if (toggleDensityBtn) {
+      var buttonText = letterCount > 6 ? 'Show more' : 'Show less';
+      toggleDensityBtn.textContent = buttonText;
+      toggleDensityBtn.disabled = letterCount <= 6;
+      if (letterCount <= 6) {
+        densityList.classList.remove('expanded');
+        toggleDensityBtn.setAttribute('aria-expanded', 'false');
+      }
+    }
+
+    for (var k = 0; k < visibleRows.length; k++) {
+      var item = visibleRows[k];
       rows.push(
         '<div class="density-row">' +
           '<span class="letter">' + item.letter + '</span>' +
@@ -150,12 +164,36 @@ document.addEventListener('DOMContentLoaded', function () {
   textInput.addEventListener('input', render);
   excludeSpacesBox.addEventListener('change', render);
 
+  document.querySelectorAll('.checkbox-label').forEach(function (label) {
+    label.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        var checkbox = label.querySelector('input[type="checkbox"]');
+        if (checkbox) {
+          checkbox.checked = !checkbox.checked;
+          checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
+    });
+  });
+
+  if (toggleDensityBtn) {
+    toggleDensityBtn.addEventListener('click', function () {
+      var expanded = densityList.classList.toggle('expanded');
+      toggleDensityBtn.textContent = expanded ? 'Show less' : 'Show more';
+      toggleDensityBtn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      render();
+    });
+  }
+
   enableLimitBox.addEventListener('change', function () {
-    limitInput.style.display = enableLimitBox.checked ? 'inline-block' : 'none';
-    if (enableLimitBox.checked) {
+    var isChecked = enableLimitBox.checked;
+    limitInput.style.display = isChecked ? 'inline-block' : 'none';
+    enableLimitBox.setAttribute('aria-expanded', isChecked ? 'true' : 'false');
+    if (isChecked) {
       limitInput.focus();
     }
-    render();
+    render(); //UPDATING ALL COUNTS WHEN ENABLE LIMIT CHECKBOX IS CHECKED OR UNCHECKED
   });
 
   limitInput.addEventListener('input', render);
@@ -165,9 +203,11 @@ document.addEventListener('DOMContentLoaded', function () {
     document.body.classList.toggle('light-theme');
     var isLightTheme = document.body.classList.contains('light-theme');
     themeToggle.setAttribute('aria-pressed', isLightTheme ? 'true' : 'false');
+    themeToggle.setAttribute('aria-label', isLightTheme ? 'Switch to dark theme' : 'Switch to light theme');
   });
 
   themeToggle.setAttribute('aria-pressed', 'false');
+  themeToggle.setAttribute('aria-label', 'Switch to light theme');
 
-  render();
+  render(); // to To initialize the page with correct values and update all statistics on page load 
 });
