@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="./styles.css" />
+<title>Task Manager</title>
+</head>
+<body>
+  <header>
+    <h1>Task Manager</h1>
+    <span id="status">Loading…</span>
+    <button id="reload-btn" class="secondary" style="margin-left:auto">Reload data</button>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>Statistics</h2>
+      <div id="stats-grid"></div>
+      <div id="priority-breakdown"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Filters</h2>
+      <div class="controls">
+        <input id="search-input" type="search" placeholder="Search titles…" />
+        <select id="status-filter">
+          <option value="all">All statuses</option>
+          <option value="completed">Completed</option>
+          <option value="pending">Pending</option>
+        </select>
+        <select id="user-filter">
+          <option value="all">All users</option>
+        </select>
+        <select id="sort-select">
+          <option value="none">Unsorted</option>
+          <option value="priority">Priority (desc), then title</option>
+          <option value="title">Title (A–Z)</option>
+          <option value="completed">Pending first</option>
+        </select>
+        <button id="export-btn" class="secondary">Export JSON</button>
+      </div>
+      <div id="export-output"></div>
+    </section>
+
+    <section class="panel">
+      <div id="task-count"></div>
+      <div class="overflow">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Title</th><th>User</th><th>Priority</th><th>Status</th><th>Due</th><th></th></tr>
+          </thead>
+          <tbody id="task-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Rate-limited fetch demo</h2>
+      <p style="color:var(--muted); font-size:0.85rem; margin:0 0 0.5rem">
+        Fetches each user's todos individually (bonus <code>fetchTodosForUsers</code>), capped at 3 concurrent requests instead of firing all of them via <code>Promise.all()</code>.
+      </p>
+      <button id="rate-limit-btn" class="secondary">Fetch todos per user</button>
+      <div id="rate-limit-output"></div>
+    </section>
+  </main>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

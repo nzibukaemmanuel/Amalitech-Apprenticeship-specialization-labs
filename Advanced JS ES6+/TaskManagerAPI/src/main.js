@@ -1,90 +1,22 @@
 import readline from 'node:readline';
 import { pathToFileURL } from 'node:url';
-import { APIClient } from './api.js';
-import { PriorityTask, User } from './models.js';
+import { TaskManager } from './taskManager.js';
 import * as processor from './taskProcessor.js';
 import { exportToJSON } from './exporter.js';
 
-const PRIORITIES = ['low', 'medium', 'high'];
+export { TaskManager };
 
-// JSONPlaceholder todos have no priority/dueDate fields, so we derive
-// deterministic pseudo-values from the todo id — same id always gives the
-// same priority/date, so results are stable across runs.
-function derivePriority(todo) {
-  return PRIORITIES[todo.id % PRIORITIES.length];
-}
-
-function deriveDueDate(todo) {
-  const daysOffset = (todo.id % 14) - 7; // spread across past + future
-  const date = new Date();
-  date.setDate(date.getDate() + daysOffset);
-  return date.toISOString();
-}
-
-export class TaskManager {
-  constructor(apiClient = new APIClient()) {
-    this.api = apiClient;
-    this.users = new Map();
-    this.tasks = [];
-  }
-
-  async load() {
-    const { users: rawUsers, todos: rawTodos } = await this.api.fetchAll();
-
-    rawUsers.forEach(({ id, name, email }) => {
-      this.users.set(id, new User({ id, name, email }));
-    });
-
-    this.tasks = rawTodos.map((todo) => {
-      const task = new PriorityTask({
-        id: todo.id,
-        title: todo.title,
-        completed: todo.completed,
-        userId: todo.userId,
-        priority: derivePriority(todo),
-        dueDate: deriveDueDate(todo)
-      });
-      this.users.get(task.userId)?.addTask(task);
-      return task;
-    });
-
-    return this;
-  }
-
-  getStatistics() {
-    return processor.calculateStatistics(this.tasks);
-  }
-
-  getTasksByUser(userId) {
-    return processor.filterByUser(this.tasks, userId);
-  }
-
-  search(query) {
-    return processor.searchTasks(this.tasks, query);
-  }
-
-  getUserList() {
-    return [...this.users.values()];
-  }
-
-  // Bonus: rate-limited concurrent per-user fetch, demonstrated separately
-  // from the cached bulk fetchTodos() used in load().
-  async fetchTodosPerUser({ concurrency = 3 } = {}) {
-    const userIds = this.getUserList().map((user) => user.id);
-    return this.api.fetchTodosForUsers(userIds, { concurrency });
-  }
-
-  // Bonus: export the current in-memory state to a JSON file.
-  async exportData(filePath = 'export.json') {
-    return exportToJSON(
-      {
-        tasks: this.tasks,
-        users: this.getUserList(),
-        statistics: this.getStatistics()
-      },
-      filePath
-    );
-  }
+// Node-only (uses node:fs) — kept out of taskManager.js so that module stays
+// usable unchanged in the browser (see web/app.js).
+async function exportManagerData(manager, filePath = 'export.json') {
+  return exportToJSON(
+    {
+      tasks: manager.tasks,
+      users: manager.getUserList(),
+      statistics: manager.getStatistics()
+    },
+    filePath
+  );
 }
 
 // ---------- CLI ----------
@@ -190,7 +122,7 @@ async function runCli(manager) {
       }
       case '8': {
         const fileName = (await ask('Export file name [export.json]: ')).trim() || 'export.json';
-        const savedTo = await manager.exportData(fileName);
+        const savedTo = await exportManagerData(manager, fileName);
         console.log(`Exported ${manager.tasks.length} tasks and ${manager.getUserList().length} users to ${savedTo}`);
         break;
       }

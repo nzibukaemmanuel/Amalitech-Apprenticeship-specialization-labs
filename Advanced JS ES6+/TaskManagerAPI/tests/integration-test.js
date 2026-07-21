@@ -1,7 +1,7 @@
 import assert from 'node:assert';
 import { APIClient } from '../src/api.js';
 import { APIError } from '../src/errors.js';
-import { TaskManager } from '../src/main.js';
+import { TaskManager } from '../src/taskManager.js';
 
 const mockUsers = [
   { id: 1, name: 'Leanne Graham', email: 'leanne@example.com' },

@@ -1,11 +1,10 @@
 # Task Manager API Client
 
-A Node.js command-line application that fetches, models, and analyzes task
-data from the [JSONPlaceholder](https://jsonplaceholder.typicode.com) API,
-built with ES6+ JavaScript.
-
-This is a **terminal application**, not a website — there is no HTML/CSS.
-Run it with `node src/main.js` and interact via the printed menu.
+A JavaScript application that fetches, models, and analyzes task data from
+the [JSONPlaceholder](https://jsonplaceholder.typicode.com) API, built with
+ES6+ JavaScript. The core logic (API client, models, processing) is plain
+ES modules shared unchanged between two front ends: a Node CLI and a
+browser-based web UI.
 
 ## Requirements
 
@@ -17,7 +16,8 @@ Run it with `node src/main.js` and interact via the printed menu.
 npm install        # no-op — zero external dependencies
 npm test            # offline unit tests (models + processor logic, no network)
 node tests/integration-test.js   # tests API client + error handling with a mocked fetch
-npm start            # runs the real CLI against the live JSONPlaceholder API
+npm start            # runs the CLI against the live JSONPlaceholder API
+npm run web          # serves the browser UI at http://localhost:5173
 ```
 
 ## Project Structure
@@ -25,15 +25,20 @@ npm start            # runs the real CLI against the live JSONPlaceholder API
 ```
 task-manager/
 ├── package.json
+├── server.js                Zero-dependency static file server for web/
 ├── src/
 │   ├── errors.js          Custom APIError / ValidationError classes
 │   ├── cache.js            Closure-based memoization cache
 │   ├── rateLimiter.js       Promise-based concurrency limiter (bonus)
-│   ├── exporter.js          JSON data export (bonus)
+│   ├── exporter.js          JSON data export (bonus, Node-only — uses node:fs)
 │   ├── api.js               APIClient — fetch, Promise.all, error handling
 │   ├── models.js            Task, PriorityTask, User classes
 │   ├── taskProcessor.js     Pure functions: filter/search/stats/group/sort
-│   └── main.js               TaskManager controller + CLI menu
+│   ├── taskManager.js       TaskManager controller — shared by CLI and web UI
+│   └── main.js               Node CLI: readline menu + Node-only export wiring
+├── web/
+│   ├── index.html            Minimal markup + embedded CSS, no build step
+│   └── app.js                 Browser entry point — imports src/ directly
 └── tests/
     ├── smoke-test.js         Offline: models + taskProcessor + cache logic
     └── integration-test.js   Mocked-fetch: APIClient + TaskManager + errors
@@ -58,6 +63,36 @@ task to its owning `User`, then drops you into a menu:
 0) Exit
 ```
 
+## Web interface (bonus)
+
+```bash
+npm run web
+```
+
+Starts `server.js` (plain `node:http`, no dependencies) and prints a
+`localhost` URL — open it in a browser. It serves `web/index.html`, which
+loads `web/app.js` as a real ES module. `app.js` imports `TaskManager` from
+`src/taskManager.js` and the filter/sort/search helpers from
+`src/taskProcessor.js` **directly** — the exact same modules the Node CLI
+uses, unbundled. Opening `web/index.html` straight from disk (`file://`)
+won't work: browsers block ES module imports under `file://` due to CORS,
+which is the entire reason `server.js` exists.
+
+The page: fetches live data on load; lets you filter by status/user, search
+by title, and sort (reusing `taskProcessor`'s comparators); toggles a task's
+`completed` state via its real `toggle()` method and re-renders stats;
+exports the current data as a downloaded JSON file (client-side, via `Blob`
+— no server round-trip); and has a button to run the rate-limited
+`fetchTodosForUsers()` demo, showing the elapsed time and per-user counts.
+
+`src/main.js`'s `TaskManager` class was extracted into `src/taskManager.js`
+specifically to make this possible: it has no Node-specific dependencies
+(no `node:fs`, no `node:readline`), so it runs unchanged in a browser. The
+JSON-file-export bonus still uses `node:fs` under the hood in the CLI
+(`exporter.js`), so that piece stays in `main.js`; the web UI does its own
+lightweight client-side download instead of trying to import Node's fs into
+a browser.
+
 ## Design notes worth knowing for a review
 
 - **Caching via closures** (`cache.js`): `createCache()` returns an object
@@ -81,10 +116,11 @@ task to its owning `User`, then drops you into a menu:
   once (default 3), rather than firing everything through `Promise.all()`
   simultaneously. `APIClient.fetchTodosForUsers()` uses it to fetch each
   user's todos individually without overwhelming the API.
-- **Data export** (`exporter.js`): `TaskManager.exportData()` serializes the
+- **Data export** (`exporter.js`): the CLI's export option serializes the
   current tasks, users, and statistics to a JSON file, relying on the
   `toJSON()` methods already defined on `Task`/`PriorityTask`/`User` so the
-  output is clean data, not raw class instances.
+  output is clean data, not raw class instances. The web UI does the
+  equivalent client-side with a `Blob` download instead (see below).
 
 ## Testing notes
 

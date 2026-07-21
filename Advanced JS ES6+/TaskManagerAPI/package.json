@@ -6,6 +6,7 @@
   "main": "src/main.js",
   "scripts": {
     "start": "node src/main.js",
+    "web": "node server.js",
     "test": "node tests/smoke-test.js"
   },
   "engines": {
