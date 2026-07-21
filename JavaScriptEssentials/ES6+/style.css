@@ -182,12 +182,19 @@ textarea {
   height: 100px;
   background: transparent;
   border: none;
+  border-radius: 10px;
   resize: none;
   color: var(--text-main);
   font-family: inherit;
   font-size: 17px;
   line-height: 1.5;
   outline: none;
+}
+
+textarea:focus-visible {
+  outline: 1px solid var(--purple);
+  outline-offset: 1px;
+  border-radius: 2px;
 }
 
 body.light-theme textarea {
@@ -288,10 +295,15 @@ body.light-theme textarea {
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
-textarea:focus-visible,
 .checkbox-label:focus-within {
   outline: 3px solid var(--purple);
   outline-offset: 2px;
+}
+
+textarea:focus-visible {
+  outline: 2px solid var(--purple);
+  outline-offset: 2px;
+  border-radius: 10px;
 }
 
 .checkbox-label:focus-within {
@@ -355,7 +367,7 @@ textarea:focus-visible,
 }
 
 .card-purple.over-limit {
-  box-shadow: 0 0 0 2px #ff4d4f inset;
+  box-shadow: 0 0 0 4px #ff4d4f inset;
 }
 
 .card-pattern-svg {
@@ -464,7 +476,7 @@ textarea:focus-visible,
 }
 
 .toggle-density {
-  background: var(--surface);
+background-color: transparent;
   color: var(--text-main);
   border: 1px solid var(--border-color);
   border-radius: 999px;
@@ -495,7 +507,6 @@ textarea:focus-visible,
   gap: 12px;
   font-size: 14px;
   padding: 8px 10px;
-  background: rgba(255, 255, 255, 0.03);
   border-radius: 10px;
   width: 100%;
   max-width: 100%;

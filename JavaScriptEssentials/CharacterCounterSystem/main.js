@@ -113,10 +113,10 @@ document.addEventListener('DOMContentLoaded', function () {
       lineText = '0' + lineText;
     }
 
-    totalCharsEl.textContent = totalChars;
+    totalCharsEl.textContent = totalChars; //displaying the total characters in html referencing totalCharsEl  
     wordCountEl.textContent = words;
     lineCountEl.textContent = lineText;
-    readingTimeEl.textContent = calcReadingTime(words);
+    readingTimeEl.textContent = calcReadingTime(words);//calls the function directly.
 
     
     if (enableLimitBox.checked) {
@@ -127,10 +127,10 @@ document.addEventListener('DOMContentLoaded', function () {
       charsCard.classList.remove('over-limit');
     }
 
-    var density = calcLetterDensity(text);
+    var density = calcLetterDensity(text);//Calculates the frequency of each letter.
     var rows = [];
     var letterCount = text.replace(/[^a-z]/gi, '').length;
-    var shouldExpand = densityList.classList.contains('expanded');
+    var shouldExpand = densityList.classList.contains('expanded');// check if we have class called expanded in the densityList element. If it does, we will show all the rows, otherwise we will show only 6 rows.
     var visibleRows = shouldExpand ? density : density.slice(0, 6);
 
     if (toggleDensityBtn) {
@@ -139,13 +139,13 @@ document.addEventListener('DOMContentLoaded', function () {
       toggleDensityBtn.disabled = letterCount <= 6;
       if (letterCount <= 6) {
         densityList.classList.remove('expanded');
-        toggleDensityBtn.setAttribute('aria-expanded', 'false');
+        toggleDensityBtn.setAttribute('aria-expanded', 'false');// 
       }
     }
 
     for (var k = 0; k < visibleRows.length; k++) {
       var item = visibleRows[k];
-      rows.push(
+      rows.push( //adds a new HTML string to the end of the rows array.
         '<div class="density-row">' +
           '<span class="letter">' + item.letter + '</span>' +
           '<div class="progress-container">' +
@@ -156,22 +156,22 @@ document.addEventListener('DOMContentLoaded', function () {
       );
     }
 
-    densityList.innerHTML = rows.join('');
+    densityList.innerHTML = rows.join('');//which displays the letter density chart.
   }
 
 
 
-  textInput.addEventListener('input', render);
+  textInput.addEventListener('input', render);//Whenever the user types, deletes, or pastes text into textInput, call the render() function.
   excludeSpacesBox.addEventListener('change', render);
 
-  document.querySelectorAll('.checkbox-label').forEach(function (label) {
-    label.addEventListener('keydown', function (event) {
+  document.querySelectorAll('.checkbox-label').forEach(function (label) { //It finds every HTML element with the class (checkbox-lebel)
+    label.addEventListener('keydown', function (event) {                     //It listens for keydown events on each label. When a key is pressed while the label is focused, it checks if the pressed key is either 'Enter' or 'Space'.
       if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
+        event.preventDefault();                                        //stops that default behavior so your custom code can handle the key press.
         var checkbox = label.querySelector('input[type="checkbox"]');
         if (checkbox) {
           checkbox.checked = !checkbox.checked;
-          checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+          checkbox.dispatchEvent(new Event('change', { bubbles: true }));// travel up the DOM tree and trigger any event listeners attached to the checkbox's change event.
         }
       }
     });
@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   if (toggleDensityBtn) {
     toggleDensityBtn.addEventListener('click', function () {
-      var expanded = densityList.classList.toggle('expanded');
+      var expanded = densityList.classList.toggle('expanded');//adds or removes a CSS class
       toggleDensityBtn.textContent = expanded ? 'Show less' : 'Show more';
       toggleDensityBtn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
       render();
@@ -206,8 +206,8 @@ document.addEventListener('DOMContentLoaded', function () {
     themeToggle.setAttribute('aria-label', isLightTheme ? 'Switch to dark theme' : 'Switch to light theme');
   });
 
-  themeToggle.setAttribute('aria-pressed', 'false');
-  themeToggle.setAttribute('aria-label', 'Switch to light theme');
+  themeToggle.setAttribute('aria-pressed', 'false');//button is not pressed by default. adds or updates the aria-pressed attribute of the theme button.
+  themeToggle.setAttribute('aria-label', 'Switch to light theme');//button a description for screen readers.
 
   render(); // to To initialize the page with correct values and update all statistics on page load 
 });

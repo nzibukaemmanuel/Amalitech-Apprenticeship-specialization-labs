@@ -24,6 +24,22 @@ document.addEventListener('DOMContentLoaded', () => {
     return text.length;
   };
 
+  const truncateToLimit = (text, limit) => {
+    if (!excludeSpacesBox.checked) {
+      return text.slice(0, limit);
+    }
+    let nonSpaceCount = 0;
+    for (let i = 0; i < text.length; i += 1) {
+      if (!/\s/.test(text[i])) {
+        nonSpaceCount += 1;
+        if (nonSpaceCount === limit) {
+          return text.slice(0, i + 1);
+        }
+      }
+    }
+    return text;
+  };
+
   const countWords = (text) => {
     const trimmed = text.trim();
     if (trimmed === '') {
@@ -72,13 +88,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const render = () => {
     let text = textInput.value;
+    const activeLimit = enableLimitBox.checked ? parseInt(limitInput.value, 10) : NaN;
+    const hasActiveLimit = !Number.isNaN(activeLimit) && activeLimit > 0;
 
-    if (enableLimitBox.checked) {
-      const limit = parseInt(limitInput.value, 10);
-      if (!Number.isNaN(limit) && limit > 0 && text.length > limit) {
-        text = text.slice(0, limit);
-        textInput.value = text;
-      }
+    if (hasActiveLimit && countCharacters(text) > activeLimit) {
+      text = truncateToLimit(text, activeLimit);
+      textInput.value = text;
     }
 
     const totalChars = countCharacters(text);
@@ -95,13 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {
     lineCountEl.textContent = lineText;
     readingTimeEl.textContent = calcReadingTime(words);
 
-    if (enableLimitBox.checked) {
-      const activeLimit = parseInt(limitInput.value, 10);
-      const overLimit = !Number.isNaN(activeLimit) && activeLimit > 0 && text.length >= activeLimit;
-      charsCard.classList.toggle('over-limit', overLimit);
-    } else {
-      charsCard.classList.remove('over-limit');
-    }
+    const overLimit = hasActiveLimit && totalChars >= activeLimit;
+    charsCard.classList.toggle('over-limit', overLimit);
 
     const density = calcLetterDensity(text);
     const letterCount = text.replace(/[^a-z]/gi, '').length;
