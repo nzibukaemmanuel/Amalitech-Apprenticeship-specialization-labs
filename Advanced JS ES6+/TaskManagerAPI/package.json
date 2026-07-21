@@ -1,0 +1,14 @@
+{
+  "name": "task-manager-api-client",
+  "version": "1.0.0",
+  "description": "ES6+ Task Manager API Client using JSONPlaceholder",
+  "type": "module",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node src/main.js",
+    "test": "node tests/smoke-test.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
