@@ -1,8 +1,8 @@
 // Browser entry point — reuses the exact same TaskManager/taskProcessor
 // modules the Node CLI uses (src/main.js). No bundler, no framework: plain
-// ES modules loaded directly by the browser, served by ../server.js.
-import { TaskManager } from '../src/taskManager.js';
-import * as processor from '../src/taskProcessor.js';
+// ES modules loaded directly by the browser, served by server.js.
+import { TaskManager } from './src/taskManager.js';
+import * as processor from './src/taskProcessor.js';
 
 const manager = new TaskManager();
 

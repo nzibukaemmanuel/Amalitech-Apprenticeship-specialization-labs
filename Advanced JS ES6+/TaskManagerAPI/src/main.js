@@ -7,7 +7,7 @@ import { exportToJSON } from './exporter.js';
 export { TaskManager };
 
 // Node-only (uses node:fs) — kept out of taskManager.js so that module stays
-// usable unchanged in the browser (see web/app.js).
+// usable unchanged in the browser (see app.js).
 async function exportManagerData(manager, filePath = 'export.json') {
   return exportToJSON(
     {

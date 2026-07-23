@@ -25,7 +25,10 @@ npm run web          # serves the browser UI at http://localhost:5173
 ```
 task-manager/
 ├── package.json
-├── server.js                Zero-dependency static file server for web/
+├── server.js                Zero-dependency static file server for the project root
+├── index.html                Minimal markup + embedded CSS, no build step
+├── styles.css                Stylesheet for the web UI
+├── app.js                     Browser entry point — imports src/ directly
 ├── src/
 │   ├── errors.js          Custom APIError / ValidationError classes
 │   ├── cache.js            Closure-based memoization cache
@@ -36,9 +39,6 @@ task-manager/
 │   ├── taskProcessor.js     Pure functions: filter/search/stats/group/sort
 │   ├── taskManager.js       TaskManager controller — shared by CLI and web UI
 │   └── main.js               Node CLI: readline menu + Node-only export wiring
-├── web/
-│   ├── index.html            Minimal markup + embedded CSS, no build step
-│   └── app.js                 Browser entry point — imports src/ directly
 └── tests/
     ├── smoke-test.js         Offline: models + taskProcessor + cache logic
     └── integration-test.js   Mocked-fetch: APIClient + TaskManager + errors
@@ -70,11 +70,11 @@ npm run web
 ```
 
 Starts `server.js` (plain `node:http`, no dependencies) and prints a
-`localhost` URL — open it in a browser. It serves `web/index.html`, which
-loads `web/app.js` as a real ES module. `app.js` imports `TaskManager` from
+`localhost` URL — open it in a browser. It serves `index.html`, which
+loads `app.js` as a real ES module. `app.js` imports `TaskManager` from
 `src/taskManager.js` and the filter/sort/search helpers from
 `src/taskProcessor.js` **directly** — the exact same modules the Node CLI
-uses, unbundled. Opening `web/index.html` straight from disk (`file://`)
+uses, unbundled. Opening `index.html` straight from disk (`file://`)
 won't work: browsers block ES module imports under `file://` due to CORS,
 which is the entire reason `server.js` exists.
 

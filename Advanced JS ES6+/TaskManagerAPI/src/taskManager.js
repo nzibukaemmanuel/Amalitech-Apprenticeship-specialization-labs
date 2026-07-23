@@ -20,7 +20,7 @@ function deriveDueDate(todo) {
 
 // Orchestrates API + models + processing. Deliberately has no I/O of its own
 // beyond the injected APIClient (no node:fs, no node:readline), so it runs
-// unchanged in Node (src/main.js CLI) or a browser (web/app.js).
+// unchanged in Node (src/main.js CLI) or a browser (app.js).
 export class TaskManager {
   constructor(apiClient = new APIClient()) {
     this.api = apiClient;

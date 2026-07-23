@@ -1,5 +1,5 @@
 // Zero-dependency static file server. Its only job is to serve this project's
-// own files over http:// so the browser can load web/app.js as a real ES
+// own files over http:// so the browser can load app.js as a real ES
 // module and follow its relative imports into src/ — opening index.html
 // directly via file:// blocks module imports under CORS rules.
 import http from 'node:http';
@@ -26,7 +26,7 @@ function resolveRequestedPath(url) {
 
 const server = http.createServer(async (req, res) => {
   if (req.url === '/') {
-    res.writeHead(302, { Location: '/web/index.html' });
+    res.writeHead(302, { Location: '/index.html' });
     res.end();
     return;
   }
