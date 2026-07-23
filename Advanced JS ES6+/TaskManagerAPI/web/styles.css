@@ -16,6 +16,8 @@
   --overdue-soft: #fef2f2;
   --done: #15803d;
   --done-soft: #ecfdf3;
+  --pending: #b45309;
+  --pending-soft: #fffbeb;
   --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
   --shadow-lg: 0 16px 40px rgba(15, 23, 42, 0.12);
   --accent-shadow: rgba(255, 161, 1, 0.25);
@@ -40,6 +42,8 @@
     --overdue-soft: rgba(248, 113, 113, 0.16);
     --done: #4ade80;
     --done-soft: rgba(74, 222, 128, 0.16);
+    --pending: #fbbf24;
+    --pending-soft: rgba(251, 191, 36, 0.16);
     --shadow: 0 10px 30px rgba(2, 8, 23, 0.35);
     --shadow-lg: 0 18px 48px rgba(2, 8, 23, 0.45);
     --accent-shadow: rgba(129, 140, 248, 0.25);
@@ -317,26 +321,50 @@ tr:last-child td {
   border-bottom: none;
 }
 
-.status-completed,
-.status-overdue {
+.status-badge {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 0.28rem 0.6rem;
+  gap: 0.4rem;
+  padding: 0.3rem 0.7rem 0.3rem 0.6rem;
   border-radius: 999px;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.02em;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.status-badge::before {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
 }
 
 .status-completed {
   background: var(--done-soft);
   color: var(--done);
+  border-color: color-mix(in srgb, var(--done) 30%, transparent);
+}
+
+.status-pending {
+  background: var(--pending-soft);
+  color: var(--pending);
+  border-color: color-mix(in srgb, var(--pending) 30%, transparent);
 }
 
 .status-overdue {
   background: var(--overdue-soft);
   color: var(--overdue);
+  border-color: color-mix(in srgb, var(--overdue) 30%, transparent);
+  animation: pulse-overdue 2.4s ease-in-out infinite;
+}
+
+@keyframes pulse-overdue {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--overdue) 35%, transparent); }
+  50% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--overdue) 0%, transparent); }
 }
 
 .row-actions button {

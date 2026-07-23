@@ -51,11 +51,17 @@ function populateUserFilter() {
   userFilter.innerHTML = `<option value="all">All users</option>${options}`;
 }
 
+function statusBadge(task) {
+  if (task.completed) return { cls: 'status-completed', label: 'Completed' };
+  if (typeof task.isOverdue === 'function' && task.isOverdue()) return { cls: 'status-overdue', label: 'Overdue' };
+  return { cls: 'status-pending', label: 'Pending' };
+}
+
 function renderTasks(tasks) {
   $('task-count').textContent = `${tasks.length} task(s)`;
   $('task-rows').innerHTML = tasks.map((task) => {
     const user = manager.users.get(task.userId);
-    const statusClass = task.completed ? 'status-completed' : task.isOverdue() ? 'status-overdue' : '';
+    const { cls, label } = statusBadge(task);
     const due = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '—';
     return `
       <tr data-id="${task.id}">
@@ -63,7 +69,7 @@ function renderTasks(tasks) {
         <td>${task.title}</td>
         <td>${user?.name ?? task.userId}</td>
         <td>${task.priority}</td>
-        <td class="${statusClass}">${task.getStatus()}</td>
+        <td><span class="status-badge ${cls}">${label}</span></td>
         <td>${due}</td>
         <td class="row-actions"><button class="secondary toggle-btn" data-id="${task.id}">Toggle</button></td>
       </tr>
