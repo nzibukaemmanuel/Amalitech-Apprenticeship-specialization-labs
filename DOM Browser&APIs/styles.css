@@ -7,7 +7,6 @@
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-serif: Georgia, 'Times New Roman', serif;
   --font-mono: 'JetBrains Mono', 'Courier New', monospace;
-  --font-script: 'Caveat', cursive;
   --font-body: var(--font-sans);
 
   /* light theme (default) */
@@ -173,20 +172,11 @@ svg { width: 18px; height: 18px; flex-shrink: 0; }
 .brand {
   display: flex;
   align-items: center;
-  gap: 8px;
   padding: 0 6px;
 }
-.brand-mark {
-  color: var(--accent);
-  width: 24px;
-  height: 24px;
-}
-.brand-name {
-  font-family: var(--font-script);
-  font-weight: 700;
-  font-size: 1.85rem;
-  line-height: 1;
-  color: var(--ink);
+.brand-logo {
+  width: 95px;
+  height: 28px;
 }
 
 .sidebar-nav { display: flex; flex-direction: column; gap: 20px; }
