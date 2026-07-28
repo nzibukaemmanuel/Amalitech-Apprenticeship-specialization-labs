@@ -363,14 +363,40 @@ svg { width: 18px; height: 18px; flex-shrink: 0; }
   z-index: 50;
   min-width: 160px;
 }
-.select-field { display: flex; flex-direction: column; gap: 4px; font-size: 0.8rem; color: var(--ink-soft); }
-.select-field select {
+.select-field { display: flex; flex-direction: column; gap: 6px; font-size: 0.8rem; color: var(--ink-soft); }
+.select-field-label { font-weight: 600; }
+
+.segmented {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-alt);
   border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--ink);
   border-radius: var(--radius-sm);
-  padding: 6px 8px;
+  padding: 3px;
 }
+.segmented-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+  border-radius: 4px;
+  padding: 6px 0;
+  cursor: pointer;
+}
+.segmented-btn:hover { color: var(--ink); }
+.segmented-btn.is-active {
+  background: var(--surface);
+  color: var(--accent);
+  box-shadow: var(--shadow);
+}
+.font-sample { font-size: 0.9rem; font-weight: 600; }
+.font-sample-sans { font-family: var(--font-sans); }
+.font-sample-serif { font-family: var(--font-serif); }
+.font-sample-mono { font-family: var(--font-mono); }
 
 .view-subtitle { color: var(--ink-soft); font-size: 0.85rem; min-height: 1.2em; }
 

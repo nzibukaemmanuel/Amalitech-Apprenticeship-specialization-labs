@@ -464,18 +464,39 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ---------------------------------------------------------------------------
-// Theme & font controls
+// Theme & font controls (segmented icon buttons)
 // ---------------------------------------------------------------------------
 
-themeSelect.addEventListener('change', () => themes.applyTheme(themeSelect.value));
-fontSelect.addEventListener('change', () => themes.applyFont(fontSelect.value));
+function setActiveSegment(container, value) {
+  container.querySelectorAll('.segmented-btn').forEach((btn) => {
+    const active = btn.dataset.value === value;
+    btn.classList.toggle('is-active', active);
+    btn.setAttribute('aria-pressed', String(active));
+  });
+}
+
+themeSelect.addEventListener('click', (e) => {
+  const btn = e.target.closest('.segmented-btn');
+  if (!btn) return;
+  themes.applyTheme(btn.dataset.value);
+  setActiveSegment(themeSelect, btn.dataset.value);
+});
+
+fontSelect.addEventListener('click', (e) => {
+  const btn = e.target.closest('.segmented-btn');
+  if (!btn) return;
+  themes.applyFont(btn.dataset.value);
+  setActiveSegment(fontSelect, btn.dataset.value);
+});
 
 // ---------------------------------------------------------------------------
 // Startup
 // ---------------------------------------------------------------------------
 
 function init() {
-  themes.applySavedPreferences();
+  const prefs = themes.applySavedPreferences();
+  setActiveSegment(themeSelect, prefs.theme);
+  setActiveSegment(fontSelect, prefs.font);
   noteManager.init();
   render();
 
