@@ -211,6 +211,13 @@
 
     <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
 
+    <div class="storage-warning" id="storage-warning" role="alert" hidden>
+      <strong>Notes can't be saved right now.</strong>
+      Your browser is blocking local storage for this page — this usually happens when the file is opened directly
+      (double-clicked) instead of served from a local web server. Serve this folder over
+      <code>http://localhost</code> (e.g. the VS Code "Live Server" extension, or <code>npx serve</code>) and reload.
+    </div>
+
     <div class="content-body">
       <section class="list-panel" aria-label="Notes list">
         <button type="button" id="new-note-btn" class="btn btn-primary btn-block">+ Create New Note</button>

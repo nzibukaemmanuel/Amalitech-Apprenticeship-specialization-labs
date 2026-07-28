@@ -531,6 +531,8 @@ fontSelect.addEventListener('click', (e) => {
 // ---------------------------------------------------------------------------
 
 function init() {
+  document.getElementById('storage-warning').hidden = storage.isStorageAvailable();
+
   const prefs = themes.applySavedPreferences();
   setActiveSegment(themeSelect, prefs.theme);
   setActiveSegment(fontSelect, prefs.font);

@@ -72,8 +72,73 @@ const DEFAULT_TAGS = [
   'react', 'recipes', 'shopping', 'travel', 'typescript',
 ];
 
+// Shown once on a brand-new install so the list isn't empty. Dates are fixed
+// (not "now") so they sort into a stable, believable order.
+function buildSampleNotes() {
+  const seeds = [
+    ['React Performance Optimization', ['dev', 'react'], '2024-10-29',
+      'Key performance optimization techniques:\n\n' +
+      '1. Code Splitting\n' +
+      '- Use React.lazy() for route-based splitting\n' +
+      '- Implement dynamic imports for heavy components\n\n' +
+      '2. Memoization\n' +
+      '- useMemo for expensive calculations\n' +
+      '- useCallback for function props\n' +
+      '- React.memo for component optimization\n\n' +
+      '3. Virtual List Implementation\n' +
+      '- Use react-window for long lists\n' +
+      '- Implement infinite scrolling\n\n' +
+      'TODO: Benchmark current application and identify bottlenecks'],
+    ['Japan Travel Planning', ['travel', 'personal'], '2024-10-28',
+      'Two-week itinerary for October:\n\n' +
+      'Tokyo (5 days) - Shibuya, Asakusa, teamLab Planets, day trip to Nikko\n' +
+      'Kyoto (4 days) - Fushimi Inari at sunrise, Arashiyama bamboo grove, tea ceremony\n' +
+      'Osaka (3 days) - Dotonbori food crawl, Osaka Castle\n' +
+      'Hakone (2 days) - Onsen ryokan, Mt. Fuji views weather permitting\n\n' +
+      "TODO: Book the JR Pass before departure — it's cheaper from abroad. Reserve the ryokan at least a month out."],
+    ['Favorite Pasta Recipes', ['cooking', 'recipes'], '2024-10-27',
+      'Cacio e Pepe\n' +
+      '- Pecorino Romano, coarse black pepper, pasta water, patience\n' +
+      '- Toast the pepper first, then build the sauce off heat\n\n' +
+      'Aglio e Olio\n' +
+      '- Garlic sliced thin, sizzled slow in olive oil until golden, not brown\n' +
+      '- Chili flakes, reserved pasta water, parsley stirred in at the end\n\n' +
+      "Notes: starchy pasta water is the emulsifier — don't skip it, and don't rinse the pasta."],
+    ['Weekly Workout Plan', ['dev', 'react'], '2024-10-25',
+      'Mon: upper body push. Tue: legs. Wed: rest or walk.\n' +
+      'Thu: upper body pull. Fri: full body. Weekend: optional cardio.\n\n' +
+      'Keep a log of weights/reps each session to track progress week over week.'],
+    ['Meal Prep Ideas', ['cooking', 'health', 'recipes'], '2024-10-12',
+      'Sunday batch cooking:\n' +
+      '- Grilled chicken breast (2 lbs), roasted vegetables (broccoli, peppers, zucchini), quinoa\n\n' +
+      'Portion into 5 containers. Freeze 2 for later in the week, refrigerate the rest.\n\n' +
+      'Quick swaps: brown rice instead of quinoa, tofu instead of chicken for meatless days.'],
+    ['Reading List', ['personal', 'dev'], '2024-10-05',
+      'Currently reading: Designing Data-Intensive Applications\n' +
+      'Up next: A Philosophy of Software Design, Atomic Habits (re-read)\n\n' +
+      "Queued: anything recommended in the team's book-club channel."],
+    ['Fitness Goals 2025', ['fitness', 'health', 'personal'], '2024-09-22',
+      'Q1: Build a consistent 4x/week routine, focus on form over weight\n' +
+      'Q2: Add a 5k target, keep strength training 2x/week\n' +
+      'H2: Reassess based on progress — possibly a half marathon\n\n' +
+      'Track weekly in the fitness app, review monthly.'],
+  ];
+
+  return seeds.map(([title, tags, date, content]) => {
+    const note = new Note(title, content, tags);
+    note.createdAt = date;
+    note.updatedAt = date;
+    return note;
+  });
+}
+
 export const init = () => {
   notes = storage.loadNotes();
+  if (notes.length === 0 && !storage.wasSeeded()) {
+    notes = buildSampleNotes();
+    storage.saveNotes(notes);
+    storage.markSeeded();
+  }
   return notes;
 };
 
