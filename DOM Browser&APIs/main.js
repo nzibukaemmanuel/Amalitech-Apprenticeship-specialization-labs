@@ -38,6 +38,7 @@ const locationDisplay = document.getElementById('location-display');
 
 const actionsPanel = document.getElementById('actions-panel');
 const archiveNoteBtn = document.getElementById('archive-note-btn');
+const archiveNoteLabel = document.getElementById('archive-note-label');
 const deleteNoteBtn = document.getElementById('delete-note-btn');
 
 const confirmModal = document.getElementById('confirm-modal');
@@ -47,8 +48,11 @@ const confirmBodyText = document.getElementById('confirm-body-text');
 
 const settingsBtn = document.getElementById('settings-btn');
 const settingsPopover = document.getElementById('settings-popover');
+const settingsPanels = document.querySelectorAll('.settings-panel');
 const themeSelect = document.getElementById('theme-select');
 const fontSelect = document.getElementById('font-select');
+const changePasswordBtn = document.getElementById('change-password-btn');
+const logoutBtn = document.getElementById('logout-btn');
 
 const viewTitle = document.getElementById('view-title');
 const viewSubtitle = document.getElementById('view-subtitle');
@@ -142,11 +146,16 @@ function fillFormFrom(note) {
   saveBtn.disabled = false;
 }
 
+function setArchiveButtonLabel(archived) {
+  archiveNoteLabel.textContent = archived ? 'Unarchive Note' : 'Archive Note';
+}
+
 function selectNote(note) {
   state.selectedId = note.id;
   state.isCreating = false;
   state.pendingLocation = note.location || null;
   fillFormFrom(note);
+  setArchiveButtonLabel(note.archived);
   showForm();
   actionsPanel.hidden = false;
   render();
@@ -435,8 +444,15 @@ sidebarScrim.addEventListener('click', closeSidebarOnMobile);
 // Settings popover (theme + font)
 // ---------------------------------------------------------------------------
 
+function showSettingsPanel(name) {
+  settingsPanels.forEach((panel) => {
+    panel.hidden = panel.id !== `settings-panel-${name}`;
+  });
+}
+
 function openSettingsPopover() {
   settingsPopover.hidden = false;
+  showSettingsPanel('root');
   settingsBtn.setAttribute('aria-expanded', 'true');
 }
 function closeSettingsPopover() {
@@ -451,6 +467,27 @@ document.addEventListener('click', (e) => {
   if (!settingsPopover.hidden && !settingsPopover.contains(e.target) && e.target !== settingsBtn) {
     closeSettingsPopover();
   }
+});
+
+settingsPopover.addEventListener('click', (e) => {
+  const openBtn = e.target.closest('[data-open-panel]');
+  if (openBtn) {
+    showSettingsPanel(openBtn.dataset.openPanel);
+    return;
+  }
+  if (e.target.closest('[data-close-panel]')) {
+    showSettingsPanel('root');
+  }
+});
+
+changePasswordBtn.addEventListener('click', () => {
+  ui.showFeedback("Password changes aren't available in this demo.");
+  closeSettingsPopover();
+});
+
+logoutBtn.addEventListener('click', () => {
+  ui.showFeedback("Logout isn't available in this demo.");
+  closeSettingsPopover();
 });
 
 // ---------------------------------------------------------------------------
@@ -468,7 +505,7 @@ document.addEventListener('keydown', (e) => {
 // ---------------------------------------------------------------------------
 
 function setActiveSegment(container, value) {
-  container.querySelectorAll('.segmented-btn').forEach((btn) => {
+  container.querySelectorAll('.settings-option').forEach((btn) => {
     const active = btn.dataset.value === value;
     btn.classList.toggle('is-active', active);
     btn.setAttribute('aria-pressed', String(active));
@@ -476,14 +513,14 @@ function setActiveSegment(container, value) {
 }
 
 themeSelect.addEventListener('click', (e) => {
-  const btn = e.target.closest('.segmented-btn');
+  const btn = e.target.closest('.settings-option');
   if (!btn) return;
   themes.applyTheme(btn.dataset.value);
   setActiveSegment(themeSelect, btn.dataset.value);
 });
 
 fontSelect.addEventListener('click', (e) => {
-  const btn = e.target.closest('.segmented-btn');
+  const btn = e.target.closest('.settings-option');
   if (!btn) return;
   themes.applyFont(btn.dataset.value);
   setActiveSegment(fontSelect, btn.dataset.value);

@@ -65,6 +65,13 @@ function normalizeTags(tags) {
 /** @type {Note[]} */
 let notes = [];
 
+// Always shown in the sidebar, even before any note uses them, so the tag
+// list isn't empty for a brand-new install.
+const DEFAULT_TAGS = [
+  'cooking', 'dev', 'fitness', 'health', 'personal',
+  'react', 'recipes', 'shopping', 'travel', 'typescript',
+];
+
 export const init = () => {
   notes = storage.loadNotes();
   return notes;
@@ -73,7 +80,7 @@ export const init = () => {
 export const getNotes = () => notes;
 
 export const getAllTags = () => {
-  const set = new Set();
+  const set = new Set(DEFAULT_TAGS);
   notes.forEach((n) => n.tags.forEach((t) => set.add(t)));
   return [...set].sort();
 };

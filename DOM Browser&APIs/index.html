@@ -57,6 +57,15 @@
   <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <path d="M20 14.2A8.2 8.2 0 1 1 9.8 4a6.6 6.6 0 0 0 10.2 10.2Z" />
   </symbol>
+  <symbol id="icon-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V7.5a4 4 0 0 1 8 0V11" />
+  </symbol>
+  <symbol id="icon-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3" /><path d="M16 16l4-4-4-4" /><path d="M20 12H9" />
+  </symbol>
+  <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M5 12.5 9.5 17 19 6.5" />
+  </symbol>
 </svg>
 
 <div class="app" id="app">
@@ -130,25 +139,72 @@
           <svg aria-hidden="true"><use href="#icon-settings" /></svg>
         </button>
         <div class="settings-popover" id="settings-popover" hidden>
-          <div class="select-field">
-            <span class="select-field-label">Theme</span>
-            <div class="segmented" id="theme-select" role="group" aria-label="Theme">
-              <button type="button" class="segmented-btn" data-value="light" aria-pressed="false" aria-label="Light">
-                <svg aria-hidden="true"><use href="#icon-sun" /></svg>
+
+          <div class="settings-panel" id="settings-panel-root">
+            <button type="button" class="settings-row" data-open-panel="theme">
+              <svg class="settings-row-icon" aria-hidden="true"><use href="#icon-sun" /></svg>
+              <span class="settings-row-label">Color Theme</span>
+              <svg class="chevron" aria-hidden="true"><use href="#icon-chevron-right" /></svg>
+            </button>
+            <button type="button" class="settings-row" data-open-panel="font">
+              <span class="settings-row-icon settings-row-icon-text" aria-hidden="true">Aa</span>
+              <span class="settings-row-label">Font Theme</span>
+              <svg class="chevron" aria-hidden="true"><use href="#icon-chevron-right" /></svg>
+            </button>
+            <hr class="settings-divider" />
+            <button type="button" class="settings-row" id="change-password-btn">
+              <svg class="settings-row-icon" aria-hidden="true"><use href="#icon-lock" /></svg>
+              <span class="settings-row-label">Change Password</span>
+            </button>
+            <button type="button" class="settings-row" id="logout-btn">
+              <svg class="settings-row-icon" aria-hidden="true"><use href="#icon-logout" /></svg>
+              <span class="settings-row-label">Logout</span>
+            </button>
+          </div>
+
+          <div class="settings-panel" id="settings-panel-theme" hidden>
+            <button type="button" class="settings-back" data-close-panel>
+              <svg class="chevron chevron-back" aria-hidden="true"><use href="#icon-chevron-right" /></svg>
+              <span>Color Theme</span>
+            </button>
+            <div class="settings-options" id="theme-select" role="group" aria-label="Theme">
+              <button type="button" class="settings-option" data-value="light" aria-pressed="false">
+                <svg class="settings-row-icon" aria-hidden="true"><use href="#icon-sun" /></svg>
+                <span class="settings-row-label">Light</span>
+                <svg class="check" aria-hidden="true"><use href="#icon-check" /></svg>
               </button>
-              <button type="button" class="segmented-btn" data-value="dark" aria-pressed="false" aria-label="Dark">
-                <svg aria-hidden="true"><use href="#icon-moon" /></svg>
+              <button type="button" class="settings-option" data-value="dark" aria-pressed="false">
+                <svg class="settings-row-icon" aria-hidden="true"><use href="#icon-moon" /></svg>
+                <span class="settings-row-label">Dark</span>
+                <svg class="check" aria-hidden="true"><use href="#icon-check" /></svg>
               </button>
             </div>
           </div>
-          <div class="select-field">
-            <span class="select-field-label">Font</span>
-            <div class="segmented" id="font-select" role="group" aria-label="Font">
-              <button type="button" class="segmented-btn font-sample font-sample-sans" data-value="sans" aria-pressed="false" aria-label="Sans">Aa</button>
-              <button type="button" class="segmented-btn font-sample font-sample-serif" data-value="serif" aria-pressed="false" aria-label="Serif">Aa</button>
-              <button type="button" class="segmented-btn font-sample font-sample-mono" data-value="mono" aria-pressed="false" aria-label="Mono">Aa</button>
+
+          <div class="settings-panel" id="settings-panel-font" hidden>
+            <button type="button" class="settings-back" data-close-panel>
+              <svg class="chevron chevron-back" aria-hidden="true"><use href="#icon-chevron-right" /></svg>
+              <span>Font Theme</span>
+            </button>
+            <div class="settings-options" id="font-select" role="group" aria-label="Font">
+              <button type="button" class="settings-option" data-value="sans" aria-pressed="false">
+                <span class="settings-row-icon settings-row-icon-text font-sample-sans" aria-hidden="true">Aa</span>
+                <span class="settings-row-label">Sans</span>
+                <svg class="check" aria-hidden="true"><use href="#icon-check" /></svg>
+              </button>
+              <button type="button" class="settings-option" data-value="serif" aria-pressed="false">
+                <span class="settings-row-icon settings-row-icon-text font-sample-serif" aria-hidden="true">Aa</span>
+                <span class="settings-row-label">Serif</span>
+                <svg class="check" aria-hidden="true"><use href="#icon-check" /></svg>
+              </button>
+              <button type="button" class="settings-option" data-value="mono" aria-pressed="false">
+                <span class="settings-row-icon settings-row-icon-text font-sample-mono" aria-hidden="true">Aa</span>
+                <span class="settings-row-label">Mono</span>
+                <svg class="check" aria-hidden="true"><use href="#icon-check" /></svg>
+              </button>
             </div>
           </div>
+
         </div>
       </div>
     </header>
@@ -220,7 +276,7 @@
 
       <aside class="actions-panel" id="actions-panel" hidden>
         <button type="button" class="btn btn-outline" id="archive-note-btn">
-          <svg aria-hidden="true"><use href="#icon-archive" /></svg> Archive Note
+          <svg aria-hidden="true"><use href="#icon-archive" /></svg> <span id="archive-note-label">Archive Note</span>
         </button>
         <button type="button" class="btn btn-outline btn-outline-danger" id="delete-note-btn">
           <svg aria-hidden="true"><use href="#icon-trash" /></svg> Delete Note
