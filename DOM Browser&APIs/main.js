@@ -7,6 +7,7 @@ import * as storage from './storage.js';
 import * as noteManager from './noteManager.js';
 import * as ui from './ui.js';
 import * as themes from './themes.js';
+import * as auth from './auth.js';
 
 // ---------------------------------------------------------------------------
 // Elements
@@ -481,13 +482,19 @@ settingsPopover.addEventListener('click', (e) => {
 });
 
 changePasswordBtn.addEventListener('click', () => {
-  ui.showFeedback("Password changes aren't available in this demo.");
-  closeSettingsPopover();
+  const session = storage.loadSession();
+  if (!session) return;
+  // Reuses the reset-password flow rather than a separate page: it already
+  // knows how to take a new password and write the hash, and the reset
+  // token still guards against the form being reachable without this click.
+  const token = auth.generateToken();
+  storage.saveResetRequest(session.email, token);
+  window.location.href = `reset-password.html?email=${encodeURIComponent(session.email)}&token=${token}`;
 });
 
 logoutBtn.addEventListener('click', () => {
-  ui.showFeedback("Logout isn't available in this demo.");
-  closeSettingsPopover();
+  storage.clearSession();
+  window.location.href = 'login.html';
 });
 
 // ---------------------------------------------------------------------------

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Login — Notes</title>
+<meta name="description" content="Log in to your Notes account." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="auth.css" />
+</head>
+<body class="auth-body">
+<a class="skip-link" href="#email">Skip to form</a>
+
+<main class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-brand" id="brand"></div>
+
+    <h1 class="auth-title">Login to your Account</h1>
+    <p class="auth-subtitle">Welcome back — pick up your notes right where you left off.</p>
+
+    <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+
+    <form class="auth-form" id="auth-form" novalidate>
+      <div class="field">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" placeholder="email@example.com" required autocomplete="email" aria-describedby="email-error" />
+        <p class="field-error" id="email-error" role="alert"></p>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="password-input">
+          <input type="password" id="password" name="password" required autocomplete="current-password" aria-describedby="password-error" />
+          <button type="button" class="password-toggle" id="password-toggle" aria-pressed="false" aria-label="Show password">
+            <svg aria-hidden="true"><use href="#icon-eye" /></svg>
+          </button>
+        </div>
+        <p class="field-error" id="password-error" role="alert"></p>
+      </div>
+
+      <div class="auth-actions-row">
+        <a href="forgot-password.html">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">Login</button>
+    </form>
+
+    <div class="auth-divider">Or log in with:</div>
+
+    <button type="button" class="btn btn-outline btn-block google-btn" id="google-btn">
+      <span class="google-icon" aria-hidden="true">G</span> Google
+    </button>
+
+    <p class="auth-footer">Don't have an account? <a href="signup.html">Sign up</a></p>
+  </div>
+</main>
+
+<script type="module" src="login.js"></script>
+</body>
+</html>

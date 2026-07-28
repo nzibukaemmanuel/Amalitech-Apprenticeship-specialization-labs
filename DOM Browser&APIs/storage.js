@@ -9,8 +9,55 @@ const NOTES_KEY = 'marginalia:notes:v2';
 const PREFS_KEY = 'marginalia:preferences';
 const DRAFT_KEY = 'marginalia:draft';
 const SEEDED_KEY = 'marginalia:seeded:v2';
+const USERS_KEY = 'marginalia:users';
+const SESSION_KEY = 'marginalia:session';
+const RESET_KEY = 'marginalia:reset-request';
+
+// Reset links "expire" after 15 minutes, the same way a real emailed
+// reset link would — long enough to actually use, short enough not to linger.
+const RESET_TTL_MS = 15 * 60 * 1000;
 
 const DEFAULT_PREFS = { theme: 'light', font: 'sans' };
+
+// ---------------------------------------------------------------------------
+// Generic read/write/remove — every function below is a thin, typed wrapper
+// around one of these three, so the try/catch + fallback logic lives in
+// exactly one place. `store` picks localStorage vs sessionStorage (drafts
+// only need to survive the tab, everything else should persist).
+// ---------------------------------------------------------------------------
+
+const read = (store, key, fallback, label) => {
+  try {
+    const raw = store.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (err) {
+    console.error(`Could not read ${label}:`, err);
+    return fallback;
+  }
+};
+
+const write = (store, key, value, label) => {
+  try {
+    store.setItem(key, JSON.stringify(value));
+    return true;
+  } catch (err) {
+    console.error(`Could not save ${label}:`, err);
+    return false;
+  }
+};
+
+const remove = (store, key, label) => {
+  try {
+    store.removeItem(key);
+  } catch (err) {
+    console.error(`Could not clear ${label}:`, err);
+  }
+};
+
+const readArray = (key, label) => {
+  const value = read(localStorage, key, [], label);
+  return Array.isArray(value) ? value : [];
+};
 
 /**
  * Browsers block localStorage on file:// pages (opaque origin), which makes
@@ -28,88 +75,19 @@ export const isStorageAvailable = () => {
   }
 };
 
-/**
- * Persist the full notes array as JSON.
- * Returns true on success, false if storage failed (quota exceeded, disabled, etc).
- */
-export const saveNotes = (notes) => {
-  try {
-    localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
-    return true;
-  } catch (err) {
-    console.error('Could not save notes to localStorage:', err);
-    return false;
-  }
-};
+export const saveNotes = (notes) => write(localStorage, NOTES_KEY, notes, 'notes');
+export const loadNotes = () => readArray(NOTES_KEY, 'notes');
 
-/**
- * Load notes from localStorage. Returns [] if nothing is stored or the
- * stored value is corrupted, so callers never have to null-check.
- */
-export const loadNotes = () => {
-  try {
-    const raw = localStorage.getItem(NOTES_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (err) {
-    console.error('Could not read notes from localStorage:', err);
-    return [];
-  }
-};
-
-export const savePreferences = (prefs) => {
-  try {
-    localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
-    return true;
-  } catch (err) {
-    console.error('Could not save preferences:', err);
-    return false;
-  }
-};
-
-export const loadPreferences = () => {
-  try {
-    const raw = localStorage.getItem(PREFS_KEY);
-    if (!raw) return { ...DEFAULT_PREFS };
-    return { ...DEFAULT_PREFS, ...JSON.parse(raw) };
-  } catch (err) {
-    console.error('Could not read preferences:', err);
-    return { ...DEFAULT_PREFS };
-  }
-};
+export const savePreferences = (prefs) => write(localStorage, PREFS_KEY, prefs, 'preferences');
+export const loadPreferences = () => ({ ...DEFAULT_PREFS, ...read(localStorage, PREFS_KEY, {}, 'preferences') });
 
 /**
  * Drafts live in sessionStorage: they're only meant to survive an accidental
  * reload/tab-close within the same session, not to persist forever.
  */
-export const saveDraft = (draft) => {
-  try {
-    sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-    return true;
-  } catch (err) {
-    console.error('Could not save draft:', err);
-    return false;
-  }
-};
-
-export const loadDraft = () => {
-  try {
-    const raw = sessionStorage.getItem(DRAFT_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch (err) {
-    console.error('Could not read draft:', err);
-    return null;
-  }
-};
-
-export const clearDraft = () => {
-  try {
-    sessionStorage.removeItem(DRAFT_KEY);
-  } catch (err) {
-    console.error('Could not clear draft:', err);
-  }
-};
+export const saveDraft = (draft) => write(sessionStorage, DRAFT_KEY, draft, 'draft');
+export const loadDraft = () => read(sessionStorage, DRAFT_KEY, null, 'draft');
+export const clearDraft = () => remove(sessionStorage, DRAFT_KEY, 'draft');
 
 /**
  * Tracks whether the one-time example notes have already been added, so a
@@ -131,3 +109,35 @@ export const markSeeded = () => {
     console.error('Could not persist seed marker:', err);
   }
 };
+
+/**
+ * Accounts, session, and reset-request storage for the auth pages
+ * (signup/login/forgot-password/reset-password). There's no backend here,
+ * so "signing up" just means writing a record to localStorage — passwords
+ * are stored as SHA-256 hashes (see auth.js), never in plain text.
+ */
+
+export const loadUsers = () => readArray(USERS_KEY, 'users');
+export const saveUsers = (users) => write(localStorage, USERS_KEY, users, 'users');
+
+export const findUserByEmail = (email) =>
+  loadUsers().find((u) => u.email.toLowerCase() === email.toLowerCase()) || null;
+
+export const addUser = (user) => saveUsers([...loadUsers(), user]);
+
+export const updateUserPassword = (email, passwordHash) => {
+  const users = loadUsers();
+  const user = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
+  if (!user) return false;
+  user.passwordHash = passwordHash;
+  return saveUsers(users);
+};
+
+export const saveSession = (email) => write(localStorage, SESSION_KEY, { email }, 'session');
+export const loadSession = () => read(localStorage, SESSION_KEY, null, 'session');
+export const clearSession = () => remove(localStorage, SESSION_KEY, 'session');
+
+export const saveResetRequest = (email, token) =>
+  write(localStorage, RESET_KEY, { email, token, expiresAt: Date.now() + RESET_TTL_MS }, 'reset request');
+export const loadResetRequest = () => read(localStorage, RESET_KEY, null, 'reset request');
+export const clearResetRequest = () => remove(localStorage, RESET_KEY, 'reset request');
