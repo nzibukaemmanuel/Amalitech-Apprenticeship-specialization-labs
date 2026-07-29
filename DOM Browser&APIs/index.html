@@ -161,6 +161,19 @@
             <svg class="chevron" aria-hidden="true"><use href="#icon-chevron-right" /></svg>
           </button>
         </li>
+
+         <div class="io-actions" id="io-actions">
+        <button type="button" class="io-action-btn" id="export-btn">
+          <svg aria-hidden="true"><use href="#icon-upload" /></svg>
+          <span>Export</span>
+        </button>
+        <span class="io-action-divider" aria-hidden="true"></span>
+        <button type="button" class="io-action-btn" id="import-btn">
+          <svg aria-hidden="true"><use href="#icon-download" /></svg>
+          <span>Import</span>
+        </button>
+        <input type="file" id="import-file-input" accept="application/json" hidden />
+      </div>
         <li>
           <button type="button" class="filter-btn" data-filter="archived">
             <svg class="nav-icon" aria-hidden="true"><use href="#icon-archive" /></svg>
@@ -168,6 +181,7 @@
           </button>
         </li>
       </ul>
+
 
       <h2 class="sidebar-heading">Folders</h2>
       <ul class="folder-list" id="folder-list" aria-label="Filter by folder">
@@ -182,15 +196,6 @@
 
     <div class="sidebar-footer">
       <p class="hint">Draft notes are saved automatically as you type, and restored if you close the tab. Drag a note onto a folder or onto "Archived Notes" to file it.</p>
-      <div class="io-actions">
-        <button type="button" class="btn-link" id="export-btn">
-          <svg aria-hidden="true"><use href="#icon-download" /></svg> Export
-        </button>
-        <button type="button" class="btn-link" id="import-btn">
-          <svg aria-hidden="true"><use href="#icon-upload" /></svg> Import
-        </button>
-        <input type="file" id="import-file-input" accept="application/json" hidden />
-      </div>
       <button type="button" class="btn btn-outline btn-block" id="install-app-btn" hidden>Install App</button>
     </div>
   </aside>

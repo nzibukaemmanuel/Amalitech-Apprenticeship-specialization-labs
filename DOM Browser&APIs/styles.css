@@ -895,10 +895,36 @@ dialog::backdrop { background: rgba(17, 21, 27, 0.45); }
 }
 .note-item-folder:empty { display: none; }
 
-/* Import/export row in the sidebar footer */
-.io-actions { display: flex; gap: 14px; margin: 10px 0 12px; }
-.io-actions .btn-link { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; }
-.io-actions .btn-link svg { width: 15px; height: 15px; }
+/* Import/export quick actions, pinned under the nav's Archived Notes row */
+.io-actions {
+  display: flex;
+  align-items: stretch;
+  margin: 2px 0 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.io-action-btn {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 9px 8px;
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
+}
+.io-action-btn svg { width: 15px; height: 15px; color: inherit; }
+.io-action-btn:hover { background: var(--bg-alt); color: var(--accent); }
+.io-action-btn:active { background: var(--border-soft); }
+.io-action-divider { width: 1px; flex: 0 0 auto; background: var(--border); }
 
 /* Drag & drop affordances */
 .note-item { cursor: grab; }

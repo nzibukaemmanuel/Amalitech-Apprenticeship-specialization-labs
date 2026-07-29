@@ -9,12 +9,8 @@ build step.
 Because it uses ES6 modules, open it through a local server rather than
 `file://` (modules are blocked by CORS on `file://` in most browsers).
 
-```bash
-python3 -m http.server 8000
-# then open http://localhost:8000
-```
 
-(Or the VS Code "Live Server" extension, or `npx serve`.)
+`the VS Code "Live Server" extension, or npx serve`.
 
 ## Project structure
 
