@@ -17,7 +17,10 @@ const RESET_KEY = 'marginalia:reset-request';
 // reset link would — long enough to actually use, short enough not to linger.
 const RESET_TTL_MS = 15 * 60 * 1000;
 
-const DEFAULT_PREFS = { theme: 'light', font: 'sans' };
+// Bonus: default to 'auto' (follow the OS/browser color-scheme preference)
+// rather than hard-coding light, so a first-time visitor sees the theme
+// their system already prefers. See themes.js for how 'auto' is resolved.
+const DEFAULT_PREFS = { theme: 'auto', font: 'sans' };
 
 // ---------------------------------------------------------------------------
 // Generic read/write/remove — every function below is a thin, typed wrapper

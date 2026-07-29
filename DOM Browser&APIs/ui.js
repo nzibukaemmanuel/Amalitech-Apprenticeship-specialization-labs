@@ -7,6 +7,7 @@ const emptyState = document.getElementById('empty-state');
 const emptyBody = document.getElementById('empty-body');
 const itemTemplate = document.getElementById('note-item-template');
 const tagListEl = document.getElementById('tag-list');
+const folderListEl = document.getElementById('folder-list');
 const feedbackEl = document.getElementById('feedback');
 
 const formatDate = (iso) => {
@@ -37,6 +38,57 @@ const highlightText = (text, query) => {
   return fragment;
 };
 
+// ---------------------------------------------------------------------------
+// Markdown (bonus): a small, deliberately limited renderer. It only knows
+// about the syntax the note-editor toolbar can insert (bold, italic, links,
+// inline code, and bulleted/numbered lists) so there's no ambiguity between
+// "what the toolbar writes" and "what gets rendered".  Everything is HTML-
+// escaped first, so raw markup a user types is never executed.
+// ---------------------------------------------------------------------------
+
+const escapeHtml = (str) => str
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;');
+
+const renderInlineMarkdown = (line) => escapeHtml(line)
+  .replace(/`([^`]+)`/g, '<code>$1</code>')
+  .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+  .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+  .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+
+/** Convert the note's plain-text/markdown content into safe HTML for the read-only preview. */
+export const renderMarkdown = (text) => {
+  const lines = (text || '').split('\n');
+  const html = [];
+  let listType = null; // 'ul' | 'ol' | null
+
+  const closeList = () => {
+    if (listType) { html.push(`</${listType}>`); listType = null; }
+  };
+
+  lines.forEach((line) => {
+    const bulletMatch = /^\s*[-*]\s+(.*)$/.exec(line);
+    const numberMatch = /^\s*\d+\.\s+(.*)$/.exec(line);
+
+    if (bulletMatch) {
+      if (listType !== 'ul') { closeList(); html.push('<ul>'); listType = 'ul'; }
+      html.push(`<li>${renderInlineMarkdown(bulletMatch[1])}</li>`);
+    } else if (numberMatch) {
+      if (listType !== 'ol') { closeList(); html.push('<ol>'); listType = 'ol'; }
+      html.push(`<li>${renderInlineMarkdown(numberMatch[1])}</li>`);
+    } else {
+      closeList();
+      if (line.trim() === '') html.push('<br>');
+      else html.push(`<p>${renderInlineMarkdown(line)}</p>`);
+    }
+  });
+  closeList();
+  return html.join('');
+};
+
 /** Build a single note list item from the <template>. */
 export const renderNoteItem = (note, { highlight = '', selected = false } = {}) => {
   const el = itemTemplate.content.firstElementChild.cloneNode(true);
@@ -44,10 +96,14 @@ export const renderNoteItem = (note, { highlight = '', selected = false } = {}) 
   el.classList.toggle('is-selected', selected);
   el.classList.toggle('is-archived', Boolean(note.archived));
   el.setAttribute('aria-selected', String(selected));
+  el.setAttribute('draggable', 'true');
 
   const titleEl = el.querySelector('.note-item-title');
   titleEl.textContent = '';
   titleEl.appendChild(highlightText(note.title, highlight));
+
+  const folderEl = el.querySelector('.note-item-folder');
+  if (folderEl) folderEl.textContent = note.folder && note.folder !== 'Uncategorized' ? note.folder : '';
 
   const tagsEl = el.querySelector('.note-tags');
   tagsEl.innerHTML = '';
@@ -119,6 +175,36 @@ export const updateTagList = (tags, activeTag = null) => {
     btn.append(icon, name);
     li.appendChild(btn);
     tagListEl.appendChild(li);
+  });
+};
+
+/** Render the folder/category sidebar list (bonus); `activeFolder` gets the active style. */
+export const updateFolderList = (folders, activeFolder = null) => {
+  if (!folderListEl) return;
+  folderListEl.innerHTML = '';
+
+  folders.forEach((folder) => {
+    const li = document.createElement('li');
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'folder-chip';
+    btn.dataset.folder = folder;
+    btn.dataset.dropTarget = 'folder';
+    if (folder === activeFolder) btn.classList.add('is-active');
+
+    const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    icon.setAttribute('aria-hidden', 'true');
+    const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    use.setAttribute('href', '#icon-folder');
+    icon.appendChild(use);
+
+    const name = document.createElement('span');
+    name.className = 'folder-name';
+    name.textContent = folder;
+
+    btn.append(icon, name);
+    li.appendChild(btn);
+    folderListEl.appendChild(li);
   });
 };
 
