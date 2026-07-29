@@ -196,6 +196,7 @@ svg { width: 18px; height: 18px; flex-shrink: 0; }
 .brand-logo {
   width: 95px;
   height: 28px;
+  color: var(--ink);
 }
 
 .sidebar-nav { display: flex; flex-direction: column; gap: 20px; }
