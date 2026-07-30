@@ -505,6 +505,8 @@ mark {
   overflow-y: auto;
   min-height: 0;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .feedback { position: fixed; top: 20px; right: 24px; z-index: 100; }
@@ -523,7 +525,7 @@ mark {
   to { opacity: 1; transform: translateY(0); }
 }
 
-#note-form { display: flex; flex-direction: column; gap: 18px; max-width: 720px; }
+#note-form { display: flex; flex-direction: column; gap: 18px; max-width: 720px; flex: 1; min-height: 0; }
 
 .detail-title-input {
   border: none;
@@ -581,7 +583,31 @@ mark {
 .location-field { flex-direction: row; align-items: center; gap: 12px; }
 .location-display { font-size: 0.82rem; color: var(--ink-soft); font-family: var(--font-mono); }
 
-.detail-actions { display: flex; justify-content: flex-start; gap: 10px; margin-top: 4px; }
+.detail-actions {
+  margin-top: auto;
+  padding-top: 20px;
+  position: sticky;
+  bottom: 0;
+  background: var(--surface);
+}
+
+.detail-actions::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 24px;
+  height: 1px;
+  background: var(--border);
+}
+
+.detail-actions-buttons {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  position: relative;
+  left: -250px;
+}
 
 .empty-detail { text-align: center; padding: 100px 20px; color: var(--ink-soft); }
 .empty-detail .empty-title { font-size: 1.2rem; }
