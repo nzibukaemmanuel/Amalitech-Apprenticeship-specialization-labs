@@ -393,7 +393,6 @@ function initNotesApp() {
   const exportBtn = document.getElementById('export-btn');
   const importBtn = document.getElementById('import-btn');
   const importFileInput = document.getElementById('import-file-input');
-  const installAppBtn = document.getElementById('install-app-btn');
 
   // ---------------------------------------------------------------------
   // State
@@ -1178,26 +1177,8 @@ function initNotesApp() {
   });
 
   // ---------------------------------------------------------------------
-  // PWA: offline support + "Install App" (bonus)
+  // PWA: offline support (bonus)
   // ---------------------------------------------------------------------
-
-  let deferredInstallPrompt = null;
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredInstallPrompt = e;
-    installAppBtn.hidden = false;
-  });
-  installAppBtn.addEventListener('click', async () => {
-    if (!deferredInstallPrompt) return;
-    deferredInstallPrompt.prompt();
-    await deferredInstallPrompt.userChoice;
-    deferredInstallPrompt = null;
-    installAppBtn.hidden = true;
-  });
-  window.addEventListener('appinstalled', () => {
-    installAppBtn.hidden = true;
-    ui.showFeedback('Notes installed.');
-  });
 
   if ('serviceWorker' in navigator) {
     // Registration silently no-ops (and rejects) on file:// or unsupported

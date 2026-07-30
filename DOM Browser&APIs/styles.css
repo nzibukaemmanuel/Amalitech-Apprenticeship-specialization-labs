@@ -1682,8 +1682,3 @@ dialog::backdrop {
   padding: 9px 10px;
   font-size: 0.82rem;
 }
-
-/* "Install App" button (PWA bonus) */
-#install-app-btn {
-  margin-top: 12px;
-}

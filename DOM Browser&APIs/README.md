@@ -50,7 +50,7 @@ another script.
 - **Export / Import (bonus)**: export all notes as a `.json` file; import merges a previously-exported file back in without duplicating existing notes.
 - **Note sharing (bonus)**: "Share Note" encodes the note directly into a URL (no server involved) — uses the native share sheet if available, otherwise shows a copyable link. Opening a shared link prompts the recipient to add a read-only copy to their own notes.
 - **Dark mode auto-detection (bonus)**: a new "Auto" theme option (alongside Light/Dark) follows the OS/browser `prefers-color-scheme` setting live; it's also the default for a first-time visitor.
-- **PWA / offline (bonus)**: web app manifest + icons + a service worker that caches the app shell, so the app (and its `localStorage` data) still opens with no connection; an "Install App" button appears when the browser offers to install it.
+- **Offline support (bonus)**: a service worker caches the app shell, so the app (and its `localStorage` data) still opens with no connection.
 - **Geolocation (bonus)**: "Add my location" button uses `navigator.geolocation`, attempts reverse geocoding to a city name (falls back to raw coordinates), and handles permission denial/timeouts gracefully.
 - **Validation**: title required, min 3 characters, inline error message, submit disabled until valid, validates on blur and on submit.
 - **Theme & font system**: light/dark/auto theme and sans/serif/mono font, applied via `data-theme`/`data-font` attributes on `<html>` and persisted.

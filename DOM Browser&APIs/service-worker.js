@@ -13,7 +13,6 @@ const APP_SHELL = [
   'ui.js',
   'themes.js',
   'main.js',
-  'manifest.json',
 ];
 
 self.addEventListener('install', (event) => {
