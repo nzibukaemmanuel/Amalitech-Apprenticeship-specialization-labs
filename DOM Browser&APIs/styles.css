@@ -162,22 +162,36 @@ svg {
   border-radius: 4px;
 }
 
+/* Scroll stays functional (wheel/keyboard/touch) as a fallback for content
+   that doesn't fit, but the scrollbar track itself is never shown — the
+   layout above is sized to fit typical viewports without one. */
+.scroll-clean {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scroll-clean::-webkit-scrollbar {
+  display: none;
+}
+
 /* ==========================================================================
    Layout shell — sidebar | list | detail | actions
    ========================================================================== */
 
 .app {
-  min-height: 100vh;
+  height: 100vh;
   display: grid;
   grid-template-columns: 248px 1fr;
   background: var(--bg);
+  overflow: hidden;
 }
 
 .content {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
   min-width: 0;
+  min-height: 0;
 }
 
 .content-header {
@@ -245,11 +259,12 @@ svg {
 .sidebar {
   background: var(--bg-alt);
   border-right: 1px solid var(--border);
-  padding: 22px 16px;
+  padding: 16px 16px;
   display: flex;
   flex-direction: column;
-  gap: 22px;
-  min-height: 100vh;
+  gap: 14px;
+  height: 100%;
+  overflow-y: auto;
 }
 
 .brand {
@@ -267,7 +282,7 @@ svg {
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
 }
 
 .filter-list {
@@ -323,7 +338,7 @@ svg {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--ink-faint);
-  margin: 4px 0 8px;
+  margin: 2px 0 4px;
   padding: 0 10px;
 }
 
@@ -338,7 +353,7 @@ svg {
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 7px 10px;
+  padding: 5px 10px;
   border: none;
   background: transparent;
   border-radius: var(--radius-sm);
@@ -483,10 +498,10 @@ svg {
 
 .list-panel {
   border-right: 1px solid var(--border);
-  padding: 22px 20px 20px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   min-height: 0;
   overflow-y: auto;
 }
@@ -709,13 +724,13 @@ svg {
 }
 
 .note-item {
-  padding: 14px 12px;
+  padding: 7px 12px;
   border-bottom: 1px solid var(--border-soft);
   border-radius: var(--radius-sm);
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 3px;
 }
 
 .note-item:hover {
@@ -724,6 +739,10 @@ svg {
 
 .note-item.is-selected {
   background: var(--bg-alt);
+}
+
+.note-item.is-archived .note-item-title {
+  color: var(--ink-soft);
 }
 
 .note-item-title {
@@ -746,7 +765,7 @@ svg {
 .note-tag {
   font-size: 0.72rem;
   font-weight: 500;
-  padding: 3px 9px;
+  padding: 2px 8px;
   border-radius: 999px;
   background: var(--tag-bg);
   color: var(--tag-ink);
@@ -950,11 +969,12 @@ mark {
 }
 
 .detail-actions {
+  display: flex;
+  justify-content: flex-start;
   margin-top: auto;
   padding-top: 20px;
   position: sticky;
   bottom: 0;
-  background: var(--surface);
 }
 
 .detail-actions::before {
@@ -969,10 +989,7 @@ mark {
 
 .detail-actions-buttons {
   display: flex;
-  justify-content: flex-start;
   gap: 10px;
-  position: relative;
-  left: -283px
 }
 
 .empty-detail {
@@ -1439,7 +1456,7 @@ dialog::backdrop {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  margin-bottom: 18px;
+  margin-bottom: 10px;
 }
 
 .folder-chip {
@@ -1450,7 +1467,7 @@ dialog::backdrop {
   border: none;
   background: transparent;
   color: var(--ink-soft);
-  padding: 7px 10px;
+  padding: 5px 10px;
   border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 0.86rem;
