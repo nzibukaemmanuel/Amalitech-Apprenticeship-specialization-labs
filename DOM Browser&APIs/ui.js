@@ -125,9 +125,13 @@ export const renderNoteItem = (note, { highlight = '', selected = false } = {}) 
  * Render the full note list. `meta` controls the empty-state copy, the
  * highlight term, and which note (if any) is marked as selected.
  */
+const MAX_VISIBLE_NOTES = 7;
+
 export const renderNotesList = (notes, meta = {}) => {
   const { highlight = '', emptyMessage, selectedId = null } = meta;
   notesListEl.innerHTML = '';
+  notesListEl.classList.remove('is-scrollable');
+  notesListEl.style.maxHeight = '';
 
   if (notes.length === 0) {
     emptyState.hidden = false;
@@ -141,6 +145,12 @@ export const renderNotesList = (notes, meta = {}) => {
     fragment.appendChild(renderNoteItem(note, { highlight, selected: note.id === selectedId }))
   );
   notesListEl.appendChild(fragment);
+
+  if (notes.length > MAX_VISIBLE_NOTES) {
+    const cutoffItem = notesListEl.children[MAX_VISIBLE_NOTES];
+    notesListEl.style.maxHeight = `${cutoffItem.offsetTop}px`;
+    notesListEl.classList.add('is-scrollable');
+  }
 };
 
 /** Render the tag sidebar list; `activeTag` gets the active style. */
