@@ -1045,6 +1045,22 @@ dialog::backdrop {
   gap: 16px;
 }
 
+.modal-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--surface-2, var(--border));
+  color: var(--ink);
+}
+
+.modal-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
 .confirm-body h2 {
   font-size: 1.15rem;
   margin-bottom: 4px;

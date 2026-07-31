@@ -369,6 +369,12 @@ function initNotesApp() {
   const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
   const confirmBodyText = document.getElementById('confirm-body-text');
 
+  const archiveModal = document.getElementById('archive-modal');
+  const archiveModalTitle = document.getElementById('archive-modal-title');
+  const archiveModalText = document.getElementById('archive-modal-text');
+  const archiveCancelBtn = document.getElementById('archive-cancel-btn');
+  const archiveConfirmBtn = document.getElementById('archive-confirm-btn');
+
   const shareModal = document.getElementById('share-modal');
   const shareLinkInput = document.getElementById('share-link-input');
   const copyShareLinkBtn = document.getElementById('copy-share-link-btn');
@@ -407,6 +413,7 @@ function initNotesApp() {
     isCreating: false,     // true while composing a brand-new (unsaved) note
     pendingLocation: null,
     pendingDeleteId: null,
+    pendingArchiveId: null,
     draggedId: null,       // note id currently being dragged (drag & drop bonus)
     previewing: false,     // markdown preview mode (bonus)
   };
@@ -905,9 +912,8 @@ function initNotesApp() {
 
   archiveNoteBtn.addEventListener('click', () => {
     if (!state.selectedId) return;
-    const updated = noteManager.toggleArchive(state.selectedId);
-    ui.showFeedback(updated.archived ? 'Note archived.' : 'Note unarchived.');
-    selectNote(updated);
+    const note = noteManager.getNotes().find((n) => n.id === state.selectedId);
+    if (note) openArchiveConfirm(note);
   });
 
   deleteNoteBtn.addEventListener('click', () => {
@@ -934,6 +940,34 @@ function initNotesApp() {
   });
   confirmModal.addEventListener('close', () => {
     state.pendingDeleteId = null;
+  });
+
+  function openArchiveConfirm(note) {
+    state.pendingArchiveId = note.id;
+    if (note.archived) {
+      archiveModalTitle.textContent = 'Unarchive note?';
+      archiveModalText.textContent = `"${note.title}" will move back to All Notes.`;
+      archiveConfirmBtn.textContent = 'Unarchive';
+    } else {
+      archiveModalTitle.textContent = 'Archive note?';
+      archiveModalText.textContent = `"${note.title}" will move to Archived Notes. You can unarchive it later.`;
+      archiveConfirmBtn.textContent = 'Archive';
+    }
+    archiveModal.showModal();
+    archiveConfirmBtn.focus();
+  }
+
+  archiveCancelBtn.addEventListener('click', () => archiveModal.close());
+  archiveConfirmBtn.addEventListener('click', () => {
+    if (state.pendingArchiveId) {
+      const updated = noteManager.toggleArchive(state.pendingArchiveId);
+      ui.showFeedback(updated.archived ? 'Note archived.' : 'Note unarchived.');
+      archiveModal.close();
+      selectNote(updated);
+    }
+  });
+  archiveModal.addEventListener('close', () => {
+    state.pendingArchiveId = null;
   });
 
   // ---------------------------------------------------------------------
