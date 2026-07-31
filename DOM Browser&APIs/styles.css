@@ -541,23 +541,10 @@ svg {
   color: var(--ink);
 }
 
-.settings-popover {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow);
-  padding: 8px;
-  z-index: 50;
-  min-width: 220px;
-}
-
-.settings-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.icon-btn-square.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
 }
 
 .settings-row {
@@ -577,6 +564,16 @@ svg {
 
 .settings-row:hover {
   background: var(--bg-alt);
+}
+
+.settings-row.is-active {
+  background: var(--bg-alt);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.settings-row.is-active .settings-row-icon {
+  color: var(--accent);
 }
 
 .settings-row-icon {
@@ -607,72 +604,145 @@ svg {
   margin: 6px 2px;
 }
 
-.settings-back {
+/* ==========================================================================
+   Settings view (replaces list-panel/detail-panel/actions-panel when active)
+   ========================================================================== */
+
+.settings-view {
+  display: none;
+  flex: 1;
+  min-height: 0;
+  /* .content-body is a 3-column grid for list/detail/actions panels;
+     without this, a 4th grid child auto-places into just the first
+     (320px) column track instead of spanning the full width. */
+  grid-column: 1 / -1;
+}
+
+.app[data-view="settings"] .settings-view {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  border: none;
-  background: transparent;
-  border-radius: var(--radius-sm);
-  padding: 9px 10px;
-  margin-bottom: 4px;
-  color: var(--ink);
-  font-weight: 600;
-  font-size: 0.88rem;
-  cursor: pointer;
-  text-align: left;
 }
 
-.settings-back:hover {
-  background: var(--bg-alt);
+.app[data-view="settings"] .list-panel,
+.app[data-view="settings"] .detail-panel,
+.app[data-view="settings"] .actions-panel {
+  display: none;
 }
 
-.chevron-back {
-  transform: rotate(180deg);
-}
-
-.settings-options {
+.settings-subnav {
+  width: 280px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  padding: 20px 16px;
   display: flex;
   flex-direction: column;
   gap: 2px;
+  overflow-y: auto;
 }
 
-.settings-option {
+.settings-detail {
+  flex: 1;
+  min-width: 0;
+  padding: 28px 36px;
+  overflow-y: auto;
+}
+
+.settings-detail h2 {
+  font-size: 1.3rem;
+  margin-bottom: 4px;
+}
+
+.settings-detail-subtitle {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  margin-bottom: 18px;
+}
+
+.settings-back-btn {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: none;
+  color: var(--ink-soft);
+  font-weight: 600;
+  padding: 4px 0;
+  margin-bottom: 14px;
+  cursor: pointer;
+}
+
+.theme-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 460px;
+  margin-bottom: 20px;
+}
+
+.theme-option {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
   width: 100%;
-  border: none;
-  background: transparent;
-  border-radius: var(--radius-sm);
-  padding: 9px 10px;
-  color: var(--ink);
-  font-size: 0.88rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  padding: 12px 16px;
   cursor: pointer;
   text-align: left;
 }
 
-.settings-option:hover {
+.theme-option:hover {
   background: var(--bg-alt);
 }
 
-.settings-option .check {
-  width: 16px;
-  height: 16px;
-  color: var(--accent);
-  visibility: hidden;
-  margin-left: auto;
-  flex: 0 0 auto;
+.theme-option.is-selected {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
-.settings-option.is-active {
-  color: var(--accent);
+.theme-option-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-alt);
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.theme-option-copy {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.theme-option-title {
   font-weight: 600;
+  color: var(--ink);
 }
 
-.settings-option.is-active .check {
-  visibility: visible;
+.theme-option-desc {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+
+.theme-option-radio {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface);
+}
+
+.theme-option.is-selected .theme-option-radio {
+  border-color: var(--accent);
+  border-width: 5px;
 }
 
 .font-sample-sans {
@@ -1226,18 +1296,76 @@ dialog::backdrop {
   background: color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
-.mobile-back-btn {
+.mobile-detail-toolbar {
   display: none;
   align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.mobile-back-btn {
+  display: flex;
+  align-items: center;
   gap: 6px;
-  align-self: flex-start;
+  flex-shrink: 0;
   border: none;
   background: none;
   color: var(--ink-soft);
   font-weight: 600;
   padding: 4px 0;
-  margin-bottom: 12px;
   cursor: pointer;
+}
+
+.mobile-detail-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.mobile-detail-toolbar-icons {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.icon-btn-ghost {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  border-radius: var(--radius-sm);
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.icon-btn-ghost:hover {
+  background: var(--bg-alt);
+  color: var(--ink);
+}
+
+#mobile-delete-btn:hover {
+  color: var(--danger);
+}
+
+.mobile-text-btn {
+  border: none;
+  background: none;
+  color: var(--ink-soft);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+.mobile-text-btn-primary {
+  color: var(--accent);
 }
 
 .mobile-view-overlay {
@@ -1286,9 +1414,7 @@ dialog::backdrop {
   }
 
   /* The header's search box and settings button are redundant with the
-     dedicated Search and Settings tabs below, so they're hidden here.
-     (#settings-popover is left alone — it's a child of .list-toolbar,
-     positioned absolutely, and still opens via the Settings tab.) */
+     dedicated Search and Settings tabs below, so they're hidden here. */
   .list-toolbar .search-box,
   #settings-btn {
     display: none;
@@ -1310,8 +1436,14 @@ dialog::backdrop {
     bottom: 84px;
   }
 
-  .mobile-back-btn {
+  .mobile-detail-toolbar {
     display: flex;
+  }
+
+  /* Replaced by the compact mobile-detail-toolbar above. */
+  .detail-actions,
+  .actions-panel {
+    display: none;
   }
 
   .mobile-view-overlay:not([hidden]) {
@@ -1330,7 +1462,8 @@ dialog::backdrop {
     display: none;
   }
 
-  .app[data-mobile-view="detail"] .fab-new-note {
+  .app[data-mobile-view="detail"] .fab-new-note,
+  .app[data-view="settings"] .fab-new-note {
     display: none;
   }
 
@@ -1343,6 +1476,31 @@ dialog::backdrop {
 
   .detail-title-input {
     font-size: 1.3rem;
+  }
+
+  /* Settings drills down one screen at a time on phones, same pattern as
+     the note list/detail toggle above: the section list ("root") or a
+     section's detail (theme/font), never both, with a back button to
+     return to the section list. */
+  .app[data-settings-section="root"] .settings-detail {
+    display: none;
+  }
+
+  .app:not([data-settings-section="root"]) .settings-subnav {
+    display: none;
+  }
+
+  .app:not([data-settings-section="root"]) .content-header {
+    display: none;
+  }
+
+  .settings-subnav {
+    width: auto;
+    border-right: none;
+  }
+
+  .settings-back-btn {
+    display: flex;
   }
 }
 
@@ -1358,11 +1516,6 @@ dialog::backdrop {
 
   .feedback {
     right: 16px;
-  }
-
-  .settings-popover {
-    right: 16px;
-    max-width: calc(100vw - 32px);
   }
 }
 

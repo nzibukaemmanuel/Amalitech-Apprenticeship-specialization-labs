@@ -205,77 +205,9 @@
           <label class="visually-hidden" for="search-input">Search notes</label>
           <input type="search" id="search-input" name="search" placeholder="Search by title, content, or tags…" autocomplete="off" />
         </form>
-        <button type="button" id="settings-btn" class="icon-btn-square" aria-haspopup="true" aria-expanded="false" aria-controls="settings-popover" aria-label="Settings">
+        <button type="button" id="settings-btn" class="icon-btn-square" aria-pressed="false" aria-label="Settings">
           <svg aria-hidden="true"><use href="#icon-settings" /></svg>
         </button>
-        <div class="settings-popover" id="settings-popover" hidden>
-
-          <div class="settings-panel" id="settings-panel-root">
-            <button type="button" class="settings-row" data-open-panel="theme">
-              <svg class="settings-row-icon" aria-hidden="true"><use href="#icon-sun" /></svg>
-              <span class="settings-row-label">Color Theme</span>
-              <svg class="chevron" aria-hidden="true"><use href="#icon-chevron-right" /></svg>
-            </button>
-            <button type="button" class="settings-row" data-open-panel="font">
-              <span class="settings-row-icon settings-row-icon-text" aria-hidden="true">Aa</span>
-              <span class="settings-row-label">Font Theme</span>
-              <svg class="chevron" aria-hidden="true"><use href="#icon-chevron-right" /></svg>
-            </button>
-            <hr class="settings-divider" />
-            <button type="button" class="settings-row" id="change-password-btn">
-              <svg class="settings-row-icon" aria-hidden="true"><use href="#icon-lock" /></svg>
-              <span class="settings-row-label">Change Password</span>
-            </button>
-            <button type="button" class="settings-row" id="logout-btn">
-              <svg class="settings-row-icon" aria-hidden="true"><use href="#icon-logout" /></svg>
-              <span class="settings-row-label">Logout</span>
-            </button>
-          </div>
-
-          <div class="settings-panel" id="settings-panel-theme" hidden>
-            <button type="button" class="settings-back" data-close-panel>
-              <svg class="chevron chevron-back" aria-hidden="true"><use href="#icon-chevron-right" /></svg>
-              <span>Color Theme</span>
-            </button>
-            <div class="settings-options" id="theme-select" role="group" aria-label="Theme">
-              <button type="button" class="settings-option" data-value="light" aria-pressed="false">
-                <svg class="settings-row-icon" aria-hidden="true"><use href="#icon-sun" /></svg>
-                <span class="settings-row-label">Light</span>
-                <svg class="check" aria-hidden="true"><use href="#icon-check" /></svg>
-              </button>
-              <button type="button" class="settings-option" data-value="dark" aria-pressed="false">
-                <svg class="settings-row-icon" aria-hidden="true"><use href="#icon-moon" /></svg>
-                <span class="settings-row-label">Dark</span>
-                <svg class="check" aria-hidden="true"><use href="#icon-check" /></svg>
-              </button>
-            </div>
-          </div>
-
-          <div class="settings-panel" id="settings-panel-font" hidden>
-            <button type="button" class="settings-back" data-close-panel>
-              <svg class="chevron chevron-back" aria-hidden="true"><use href="#icon-chevron-right" /></svg>
-              <span>Font Theme</span>
-            </button>
-            <div class="settings-options" id="font-select" role="group" aria-label="Font">
-              <button type="button" class="settings-option" data-value="sans" aria-pressed="false">
-                <span class="settings-row-icon settings-row-icon-text font-sample-sans" aria-hidden="true">Aa</span>
-                <span class="settings-row-label">Sans</span>
-                <svg class="check" aria-hidden="true"><use href="#icon-check" /></svg>
-              </button>
-              <button type="button" class="settings-option" data-value="serif" aria-pressed="false">
-                <span class="settings-row-icon settings-row-icon-text font-sample-serif" aria-hidden="true">Aa</span>
-                <span class="settings-row-label">Serif</span>
-                <svg class="check" aria-hidden="true"><use href="#icon-check" /></svg>
-              </button>
-              <button type="button" class="settings-option" data-value="mono" aria-pressed="false">
-                <span class="settings-row-icon settings-row-icon-text font-sample-mono" aria-hidden="true">Aa</span>
-                <span class="settings-row-label">Mono</span>
-                <svg class="check" aria-hidden="true"><use href="#icon-check" /></svg>
-              </button>
-            </div>
-          </div>
-
-        </div>
       </div>
     </header>
 
@@ -303,9 +235,23 @@
       </section>
 
       <main id="detail-panel" class="detail-panel scroll-clean">
-        <button type="button" class="mobile-back-btn" id="mobile-detail-back-btn">
-          <svg aria-hidden="true"><use href="#icon-chevron-left" /></svg> Notes
-        </button>
+        <div class="mobile-detail-toolbar" id="mobile-detail-toolbar">
+          <button type="button" class="mobile-back-btn" id="mobile-detail-back-btn">
+            <svg aria-hidden="true"><use href="#icon-chevron-left" /></svg> Go Back
+          </button>
+          <div class="mobile-detail-toolbar-actions">
+            <span class="mobile-detail-toolbar-icons" id="mobile-detail-toolbar-icons" hidden>
+              <button type="button" class="icon-btn-ghost" id="mobile-delete-btn" aria-label="Delete note">
+                <svg aria-hidden="true"><use href="#icon-trash" /></svg>
+              </button>
+              <button type="button" class="icon-btn-ghost" id="mobile-archive-btn" aria-label="Archive note">
+                <svg aria-hidden="true"><use href="#icon-archive" /></svg>
+              </button>
+            </span>
+            <button type="button" class="mobile-text-btn" id="mobile-cancel-btn">Cancel</button>
+            <button type="button" class="mobile-text-btn mobile-text-btn-primary" id="mobile-save-btn">Save Note</button>
+          </div>
+        </div>
 
         <form id="note-form" novalidate hidden>
       <input type="hidden" id="note-id" name="id" />
@@ -394,6 +340,92 @@
           <svg aria-hidden="true"><use href="#icon-trash" /></svg> Delete Note
         </button>
       </aside>
+
+      <div class="settings-view" id="settings-view" hidden>
+        <nav class="settings-subnav scroll-clean" aria-label="Settings sections">
+          <button type="button" class="settings-row" id="settings-section-theme-btn" data-section="theme">
+            <svg class="settings-row-icon" aria-hidden="true"><use href="#icon-sun" /></svg>
+            <span class="settings-row-label">Color Theme</span>
+            <svg class="chevron" aria-hidden="true"><use href="#icon-chevron-right" /></svg>
+          </button>
+          <button type="button" class="settings-row" id="settings-section-font-btn" data-section="font">
+            <span class="settings-row-icon settings-row-icon-text" aria-hidden="true">Aa</span>
+            <span class="settings-row-label">Font Theme</span>
+            <svg class="chevron" aria-hidden="true"><use href="#icon-chevron-right" /></svg>
+          </button>
+          <hr class="settings-divider" />
+          <button type="button" class="settings-row" id="change-password-btn">
+            <svg class="settings-row-icon" aria-hidden="true"><use href="#icon-lock" /></svg>
+            <span class="settings-row-label">Change Password</span>
+          </button>
+          <button type="button" class="settings-row" id="logout-btn">
+            <svg class="settings-row-icon" aria-hidden="true"><use href="#icon-logout" /></svg>
+            <span class="settings-row-label">Logout</span>
+          </button>
+        </nav>
+
+        <div class="settings-detail scroll-clean">
+          <button type="button" class="settings-back-btn" id="settings-back-btn">
+            <svg aria-hidden="true"><use href="#icon-chevron-left" /></svg> Settings
+          </button>
+
+          <section class="settings-detail-section" id="settings-detail-theme">
+            <h2>Color Theme</h2>
+            <p class="settings-detail-subtitle">Choose your color theme:</p>
+            <div class="theme-options" id="theme-options" role="radiogroup" aria-label="Color theme">
+              <button type="button" class="theme-option" data-value="light" role="radio" aria-checked="false">
+                <span class="theme-option-icon"><svg aria-hidden="true"><use href="#icon-sun" /></svg></span>
+                <span class="theme-option-copy">
+                  <span class="theme-option-title">Light Mode</span>
+                  <span class="theme-option-desc">Pick a clean and classic light theme</span>
+                </span>
+                <span class="theme-option-radio" aria-hidden="true"></span>
+              </button>
+              <button type="button" class="theme-option" data-value="dark" role="radio" aria-checked="false">
+                <span class="theme-option-icon"><svg aria-hidden="true"><use href="#icon-moon" /></svg></span>
+                <span class="theme-option-copy">
+                  <span class="theme-option-title">Dark Mode</span>
+                  <span class="theme-option-desc">Select a sleek and modern dark theme</span>
+                </span>
+                <span class="theme-option-radio" aria-hidden="true"></span>
+              </button>
+            </div>
+            <button type="button" class="btn btn-primary" id="apply-theme-btn" disabled>Apply Changes</button>
+          </section>
+
+          <section class="settings-detail-section" id="settings-detail-font" hidden>
+            <h2>Font Theme</h2>
+            <p class="settings-detail-subtitle">Choose your font theme:</p>
+            <div class="theme-options" id="font-options" role="radiogroup" aria-label="Font theme">
+              <button type="button" class="theme-option" data-value="sans" role="radio" aria-checked="false">
+                <span class="theme-option-icon font-sample-sans" aria-hidden="true">Aa</span>
+                <span class="theme-option-copy">
+                  <span class="theme-option-title">Sans</span>
+                  <span class="theme-option-desc">Clean and modern sans-serif</span>
+                </span>
+                <span class="theme-option-radio" aria-hidden="true"></span>
+              </button>
+              <button type="button" class="theme-option" data-value="serif" role="radio" aria-checked="false">
+                <span class="theme-option-icon font-sample-serif" aria-hidden="true">Aa</span>
+                <span class="theme-option-copy">
+                  <span class="theme-option-title">Serif</span>
+                  <span class="theme-option-desc">Classic serif for a literary feel</span>
+                </span>
+                <span class="theme-option-radio" aria-hidden="true"></span>
+              </button>
+              <button type="button" class="theme-option" data-value="mono" role="radio" aria-checked="false">
+                <span class="theme-option-icon font-sample-mono" aria-hidden="true">Aa</span>
+                <span class="theme-option-copy">
+                  <span class="theme-option-title">Mono</span>
+                  <span class="theme-option-desc">Monospaced, code-friendly look</span>
+                </span>
+                <span class="theme-option-radio" aria-hidden="true"></span>
+              </button>
+            </div>
+            <button type="button" class="btn btn-primary" id="apply-font-btn" disabled>Apply Changes</button>
+          </section>
+        </div>
+      </div>
     </div>
   </div>
 

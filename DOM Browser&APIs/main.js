@@ -362,10 +362,16 @@ function initNotesApp() {
   const sharedNoteImportBtn = document.getElementById('shared-note-import-btn');
 
   const settingsBtn = document.getElementById('settings-btn');
-  const settingsPopover = document.getElementById('settings-popover');
-  const settingsPanels = document.querySelectorAll('.settings-panel');
-  const themeSelect = document.getElementById('theme-select');
-  const fontSelect = document.getElementById('font-select');
+  const settingsView = document.getElementById('settings-view');
+  const settingsSectionThemeBtn = document.getElementById('settings-section-theme-btn');
+  const settingsSectionFontBtn = document.getElementById('settings-section-font-btn');
+  const settingsBackBtn = document.getElementById('settings-back-btn');
+  const settingsDetailTheme = document.getElementById('settings-detail-theme');
+  const settingsDetailFont = document.getElementById('settings-detail-font');
+  const themeOptions = document.getElementById('theme-options');
+  const fontOptions = document.getElementById('font-options');
+  const applyThemeBtn = document.getElementById('apply-theme-btn');
+  const applyFontBtn = document.getElementById('apply-font-btn');
   const changePasswordBtn = document.getElementById('change-password-btn');
   const logoutBtn = document.getElementById('logout-btn');
 
@@ -380,6 +386,11 @@ function initNotesApp() {
   const fabNewNoteBtn = document.getElementById('fab-new-note-btn');
   const mobileTabbar = document.getElementById('mobile-tabbar');
   const mobileDetailBackBtn = document.getElementById('mobile-detail-back-btn');
+  const mobileDetailToolbarIcons = document.getElementById('mobile-detail-toolbar-icons');
+  const mobileDeleteBtn = document.getElementById('mobile-delete-btn');
+  const mobileArchiveBtn = document.getElementById('mobile-archive-btn');
+  const mobileCancelBtn = document.getElementById('mobile-cancel-btn');
+  const mobileSaveBtn = document.getElementById('mobile-save-btn');
 
   const mobileSearchView = document.getElementById('mobile-search-view');
   const mobileSearchBackBtn = document.getElementById('mobile-search-back-btn');
@@ -410,6 +421,10 @@ function initNotesApp() {
     pendingArchiveId: null,
     draggedId: null,       // note id currently being dragged (drag & drop bonus)
     previewing: false,     // markdown preview mode (bonus)
+    view: 'notes',         // 'notes' | 'settings'
+    settingsSection: 'root', // 'root' | 'theme' | 'font' — 'root' only means something on phones
+    pendingTheme: null,    // staged (not-yet-applied) theme/font selection in the Settings view
+    pendingFont: null,
   };
 
   // ---------------------------------------------------------------------
@@ -433,6 +448,11 @@ function initNotesApp() {
   }
 
   function updateHeader() {
+    if (state.view === 'settings') {
+      viewTitle.textContent = 'Settings';
+      viewSubtitle.textContent = '';
+      return;
+    }
     viewTitle.textContent = state.filter === 'archived' ? 'Archived Notes' : 'All Notes';
     const parts = [];
     if (state.folder) parts.push(`in ${state.folder}`);
@@ -470,6 +490,7 @@ function initNotesApp() {
     ui.toggleArchiveView(state.filter === 'archived');
     updateHeader();
     updateMobileTabbar();
+    renderSettingsView();
   }
 
   // ---------------------------------------------------------------------
@@ -505,6 +526,7 @@ function initNotesApp() {
     noteForm.hidden = true;
     emptyDetail.hidden = false;
     actionsPanel.hidden = true;
+    mobileDetailToolbarIcons.hidden = true;
     noteForm.reset();
     setPreviewMode(false);
     ui.showValidationError('note-title', '');
@@ -557,6 +579,7 @@ function initNotesApp() {
     setArchiveButtonLabel(note.archived);
     showForm();
     actionsPanel.hidden = false;
+    mobileDetailToolbarIcons.hidden = false;
     setMobileView('detail');
     render();
   }
@@ -579,6 +602,7 @@ function initNotesApp() {
     restoreDraftIfAny();
     showForm();
     actionsPanel.hidden = true;
+    mobileDetailToolbarIcons.hidden = true;
     setMobileView('detail');
     render();
     noteTitleInput.focus();
@@ -740,7 +764,7 @@ function initNotesApp() {
     closeDetail();
   });
 
-  cancelBtn.addEventListener('click', () => {
+  function discardChanges() {
     if (state.isCreating) {
       storage.clearDraft();
       closeDetail();
@@ -754,7 +778,11 @@ function initNotesApp() {
         ui.showFeedback('Changes discarded.');
       }
     }
-  });
+  }
+
+  cancelBtn.addEventListener('click', discardChanges);
+  mobileCancelBtn.addEventListener('click', discardChanges);
+  mobileSaveBtn.addEventListener('click', () => noteForm.requestSubmit());
 
   // ---------------------------------------------------------------------
   // Geolocation (bonus browser API)
@@ -938,17 +966,22 @@ function initNotesApp() {
   });
   shareCloseBtn.addEventListener('click', () => shareModal.close());
 
-  archiveNoteBtn.addEventListener('click', () => {
+  function archiveSelectedNote() {
     if (!state.selectedId) return;
     const note = noteManager.getNotes().find((n) => n.id === state.selectedId);
     if (note) openArchiveConfirm(note);
-  });
+  }
 
-  deleteNoteBtn.addEventListener('click', () => {
+  function deleteSelectedNote() {
     if (!state.selectedId) return;
     const note = noteManager.getNotes().find((n) => n.id === state.selectedId);
     if (note) openDeleteConfirm(note);
-  });
+  }
+
+  archiveNoteBtn.addEventListener('click', archiveSelectedNote);
+  deleteNoteBtn.addEventListener('click', deleteSelectedNote);
+  mobileArchiveBtn.addEventListener('click', archiveSelectedNote);
+  mobileDeleteBtn.addEventListener('click', deleteSelectedNote);
 
   function openDeleteConfirm(note) {
     state.pendingDeleteId = note.id;
@@ -1101,12 +1134,14 @@ function initNotesApp() {
 
   function selectFilter(filter) {
     state.filter = filter;
+    state.view = 'notes';
     setMobileView('list');
     render();
   }
 
   function selectTag(tag) {
     state.tag = state.tag === tag ? null : tag;
+    state.view = 'notes';
     closeMobileOverlays();
     setMobileView('list');
     render();
@@ -1114,6 +1149,7 @@ function initNotesApp() {
 
   function selectFolder(folder) {
     state.folder = state.folder === folder ? null : folder;
+    state.view = 'notes';
     closeMobileOverlays();
     setMobileView('list');
     render();
@@ -1138,45 +1174,90 @@ function initNotesApp() {
   });
 
   // ---------------------------------------------------------------------
-  // Settings popover (theme + font)
+  // Settings view — a full page (like "All Notes"/"Archived Notes") rather
+  // than a dropdown, with a section sub-nav (always visible on desktop,
+  // shown as its own screen on phones) and Color Theme / Font Theme detail
+  // sections that stage a choice until "Apply Changes" commits it.
   // ---------------------------------------------------------------------
 
-  function showSettingsPanel(name) {
-    settingsPanels.forEach((panel) => {
-      panel.hidden = panel.id !== `settings-panel-${name}`;
+  function openSettingsView() {
+    state.view = 'settings';
+    state.settingsSection = 'root';
+    state.pendingTheme = themes.getThemeMode();
+    state.pendingFont = themes.getFont();
+    render();
+  }
+
+  function closeSettingsView() {
+    state.view = 'notes';
+    render();
+  }
+
+  function selectSettingsSection(section) {
+    state.settingsSection = section;
+    if (section === 'theme') state.pendingTheme = themes.getThemeMode();
+    if (section === 'font') state.pendingFont = themes.getFont();
+    render();
+  }
+
+  function renderSettingsView() {
+    appEl.dataset.view = state.view;
+    appEl.dataset.settingsSection = state.settingsSection;
+    settingsView.hidden = state.view !== 'settings';
+    settingsBtn.classList.toggle('is-active', state.view === 'settings');
+    settingsBtn.setAttribute('aria-pressed', String(state.view === 'settings'));
+
+    const effectiveSection = state.settingsSection === 'root' ? 'theme' : state.settingsSection;
+    settingsDetailTheme.hidden = effectiveSection !== 'theme';
+    settingsDetailFont.hidden = effectiveSection !== 'font';
+    settingsSectionThemeBtn.classList.toggle('is-active', effectiveSection === 'theme');
+    settingsSectionFontBtn.classList.toggle('is-active', effectiveSection === 'font');
+
+    themeOptions.querySelectorAll('.theme-option').forEach((btn) => {
+      const checked = btn.dataset.value === state.pendingTheme;
+      btn.classList.toggle('is-selected', checked);
+      btn.setAttribute('aria-checked', String(checked));
     });
+    applyThemeBtn.disabled = !state.pendingTheme || state.pendingTheme === themes.getThemeMode();
+
+    fontOptions.querySelectorAll('.theme-option').forEach((btn) => {
+      const checked = btn.dataset.value === state.pendingFont;
+      btn.classList.toggle('is-selected', checked);
+      btn.setAttribute('aria-checked', String(checked));
+    });
+    applyFontBtn.disabled = !state.pendingFont || state.pendingFont === themes.getFont();
   }
 
-  function openSettingsPopover() {
-    settingsPopover.hidden = false;
-    showSettingsPanel('root');
-    settingsBtn.setAttribute('aria-expanded', 'true');
-    updateMobileTabbar();
-  }
-  function closeSettingsPopover() {
-    settingsPopover.hidden = true;
-    settingsBtn.setAttribute('aria-expanded', 'false');
-    updateMobileTabbar();
-  }
-  settingsBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    settingsPopover.hidden ? openSettingsPopover() : closeSettingsPopover();
-  });
-  document.addEventListener('click', (e) => {
-    if (!settingsPopover.hidden && !settingsPopover.contains(e.target) && e.target !== settingsBtn) {
-      closeSettingsPopover();
-    }
+  settingsBtn.addEventListener('click', () => {
+    state.view === 'settings' ? closeSettingsView() : openSettingsView();
   });
 
-  settingsPopover.addEventListener('click', (e) => {
-    const openBtn = e.target.closest('[data-open-panel]');
-    if (openBtn) {
-      showSettingsPanel(openBtn.dataset.openPanel);
-      return;
-    }
-    if (e.target.closest('[data-close-panel]')) {
-      showSettingsPanel('root');
-    }
+  settingsBackBtn.addEventListener('click', () => selectSettingsSection('root'));
+  settingsSectionThemeBtn.addEventListener('click', () => selectSettingsSection('theme'));
+  settingsSectionFontBtn.addEventListener('click', () => selectSettingsSection('font'));
+
+  themeOptions.addEventListener('click', (e) => {
+    const btn = e.target.closest('.theme-option');
+    if (!btn) return;
+    state.pendingTheme = btn.dataset.value;
+    renderSettingsView();
+  });
+  applyThemeBtn.addEventListener('click', () => {
+    themes.applyTheme(state.pendingTheme);
+    ui.showFeedback('Settings updated successfully!');
+    renderSettingsView();
+  });
+
+  fontOptions.addEventListener('click', (e) => {
+    const btn = e.target.closest('.theme-option');
+    if (!btn) return;
+    state.pendingFont = btn.dataset.value;
+    renderSettingsView();
+  });
+  applyFontBtn.addEventListener('click', () => {
+    themes.applyFont(state.pendingFont);
+    ui.showFeedback('Settings updated successfully!');
+    renderSettingsView();
   });
 
   changePasswordBtn.addEventListener('click', () => {
@@ -1211,7 +1292,7 @@ function initNotesApp() {
     let active = state.filter === 'archived' ? 'archived' : 'home';
     if (!mobileSearchView.hidden) active = 'search';
     else if (!mobileTagsView.hidden) active = 'tags';
-    else if (!settingsPopover.hidden) active = 'settings';
+    else if (state.view === 'settings') active = 'settings';
 
     mobileTabbar.querySelectorAll('.tab-btn').forEach((btn) => {
       btn.classList.toggle('is-active', btn.dataset.tab === active);
@@ -1258,16 +1339,14 @@ function initNotesApp() {
     const btn = e.target.closest('.tab-btn');
     if (!btn) return;
     const tab = btn.dataset.tab;
+    closeMobileOverlays();
 
     if (tab === 'settings') {
-      e.stopPropagation(); // otherwise the document click-outside listener below closes it right back
-      closeMobileOverlays();
-      settingsPopover.hidden ? openSettingsPopover() : closeSettingsPopover();
+      state.view === 'settings' ? closeSettingsView() : openSettingsView();
       return;
     }
 
-    closeMobileOverlays();
-    closeSettingsPopover();
+    if (state.view === 'settings') closeSettingsView();
     if (tab === 'home') selectFilter('all');
     else if (tab === 'archived') selectFilter('archived');
     else if (tab === 'search') openMobileSearch();
@@ -1281,35 +1360,7 @@ function initNotesApp() {
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (!mobileSearchView.hidden || !mobileTagsView.hidden) closeMobileOverlays();
-    if (!settingsPopover.hidden) closeSettingsPopover();
-  });
-
-  // ---------------------------------------------------------------------
-  // Theme & font controls (segmented icon buttons)
-  // ---------------------------------------------------------------------
-
-  function setActiveSegment(container, value) {
-    container.querySelectorAll('.settings-option').forEach((btn) => {
-      const active = btn.dataset.value === value;
-      btn.classList.toggle('is-active', active);
-      btn.setAttribute('aria-pressed', String(active));
-    });
-  }
-
-  themeSelect.addEventListener('click', (e) => {
-    const btn = e.target.closest('.settings-option');
-    if (!btn || btn.classList.contains('is-active')) return;
-    themes.applyTheme(btn.dataset.value);
-    setActiveSegment(themeSelect, btn.dataset.value);
-    ui.showFeedback('Settings updated successfully!');
-  });
-
-  fontSelect.addEventListener('click', (e) => {
-    const btn = e.target.closest('.settings-option');
-    if (!btn || btn.classList.contains('is-active')) return;
-    themes.applyFont(btn.dataset.value);
-    setActiveSegment(fontSelect, btn.dataset.value);
-    ui.showFeedback('Settings updated successfully!');
+    if (state.view === 'settings') closeSettingsView();
   });
 
   // ---------------------------------------------------------------------
@@ -1329,9 +1380,7 @@ function initNotesApp() {
   function init() {
     document.getElementById('storage-warning').hidden = storage.isStorageAvailable();
 
-    const prefs = themes.applySavedPreferences();
-    setActiveSegment(themeSelect, prefs.theme);
-    setActiveSegment(fontSelect, prefs.font);
+    themes.applySavedPreferences();
     noteManager.init();
     populateFolderSelect();
     setMobileView('list');
