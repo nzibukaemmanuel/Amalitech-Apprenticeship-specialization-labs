@@ -35,12 +35,6 @@ export function createCache() {
   };
 }
 
-// Higher-order function: wraps any async function so repeated calls with the
-// same derived key are served from cache instead of hitting the network again.
-// Note: since `undefined` is used as the "not cached" sentinel, a wrapped
-// function that legitimately resolves to `undefined` will never be treated
-// as a cache hit. Fine here (API responses are always arrays/objects), but
-// worth knowing if this cache is reused for other purposes.
 export function withCache(cache, keyFn, fn) {
   return async (...args) => {
     const key = keyFn(...args);
