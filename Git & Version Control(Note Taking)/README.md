@@ -21,7 +21,7 @@ nothing more:
 |---|---|
 | `storage.js` | All `localStorage`/`sessionStorage` reads & writes: notes, preferences, drafts, and (for the demo login system) accounts/session/reset-requests. Only place that touches Web Storage. |
 | `noteManager.js` | `Note` class + in-memory notes array; create/update/delete/search/filter/reorder. Persists via `storage.js` after every mutation. |
-| `ui.js` | Pure rendering: note cards, tag/folder sidebars, the markdown preview renderer, validation messages, toasts. Never touches storage. |
+| `ui.js` | Pure rendering: note cards, the tag sidebar, validation messages, toasts. Never touches storage. |
 | `themes.js` | Applies/persists color theme (light/dark/auto) and font family (sans/serif/mono). |
 | `main.js` | The single entry point every page loads. Detects which page it's on and wires up only that page: the notes app (`index.html`), or one of the four auth pages (login/signup/forgot-password/reset-password). |
 
@@ -41,14 +41,10 @@ another script.
 
 - **CRUD**: create, edit (modal), archive/unarchive, delete (with confirm dialog), all synced to `localStorage`.
 - **Tags**: comma-separated tag input, deduped, sidebar tag filter, click a tag again to clear it.
-- **Folders/categories (bonus)**: assign a note to a folder (or create a new one inline), filter by folder in the sidebar, drag a note onto a folder chip to move it.
 - **Search**: live filtering across title/content/tags, with match highlighting (`<mark>`).
 - **Archive view**: separate "All notes" / "Archived" views with counts; drag a note onto "Archived Notes" / "All Notes" to (un)archive it.
-- **Drag & drop (bonus)**: reorder notes in the list, or drag onto a folder/archive target as above.
-- **Drafts**: while creating a new note, title/content/tags/folder autosave to `sessionStorage` every 300ms and are restored if you reload or reopen the tab; cleared on successful save.
-- **Formatting toolbar + Markdown preview (bonus)**: Bold/Italic/Bulleted list/Numbered list/Link buttons insert lightweight markdown syntax into the note; a "Preview" toggle renders that markdown (safely, HTML-escaped first) instead of full `contenteditable` rich text, so there's one consistent format instead of two competing ones.
-- **Export / Import (bonus)**: export all notes as a `.json` file; import merges a previously-exported file back in without duplicating existing notes.
-- **Note sharing (bonus)**: "Share Note" encodes the note directly into a URL (no server involved) — uses the native share sheet if available, otherwise shows a copyable link. Opening a shared link prompts the recipient to add a read-only copy to their own notes.
+- **Drag & drop (bonus)**: reorder notes in the list, or drag onto the archive target as above.
+- **Drafts**: while creating a new note, title/content/tags autosave to `sessionStorage` every 300ms and are restored if you reload or reopen the tab; cleared on successful save.
 - **Dark mode auto-detection (bonus)**: a new "Auto" theme option (alongside Light/Dark) follows the OS/browser `prefers-color-scheme` setting live; it's also the default for a first-time visitor.
 - **Offline support (bonus)**: a service worker caches the app shell, so the app (and its `localStorage` data) still opens with no connection.
 - **Geolocation (bonus)**: "Add my location" button uses `navigator.geolocation`, attempts reverse geocoding to a city name (falls back to raw coordinates), and handles permission denial/timeouts gracefully.
@@ -63,6 +59,4 @@ another script.
 The UI keeps its "notebook" point of view: a dot-grid backdrop, colored tag
 chips, and a font switcher (sans/serif/mono) that's treated as a real
 typographic feature. Bonus features were designed to sit inside that
-existing visual language rather than bolt on a different style — folders
-reuse the tag-chip look, the formatting toolbar sits quietly above the
-textarea, and the share/import dialogs reuse the existing modal styling.
+existing visual language rather than bolt on a different style.
