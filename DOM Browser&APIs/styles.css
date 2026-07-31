@@ -239,19 +239,6 @@ svg {
   min-height: 0;
 }
 
-.menu-toggle {
-  display: none;
-  position: fixed;
-  top: 14px;
-  left: 14px;
-  z-index: 70;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  border-radius: var(--radius-sm);
-  padding: 8px 10px;
-  box-shadow: var(--shadow);
-}
-
 /* ==========================================================================
    Sidebar
    ========================================================================== */
@@ -392,10 +379,6 @@ svg {
   font-size: 0.78rem;
   color: var(--ink-faint);
   line-height: 1.5;
-}
-
-.sidebar-scrim {
-  display: none;
 }
 
 /* ==========================================================================
@@ -1039,8 +1022,10 @@ mark {
   justify-content: flex-start;
   margin-top: auto;
   padding-top: 20px;
+  padding-bottom: 4px;
   position: sticky;
   bottom: 0;
+  background: var(--bg);
 }
 
 .detail-actions::before {
@@ -1170,6 +1155,117 @@ dialog::backdrop {
   }
 }
 
+/* ==========================================================================
+   Mobile navigation — bottom tab bar, FAB, and full-screen overlays.
+   Hidden by default; only enabled at the phone breakpoint below, where they
+   replace the hamburger/sidebar-drawer pattern used at wider widths.
+   ========================================================================== */
+
+.fab-new-note {
+  display: none;
+  position: fixed;
+  right: 20px;
+  bottom: 84px;
+  z-index: 45;
+  width: 52px;
+  height: 52px;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+
+.fab-new-note:hover {
+  background: var(--accent-ink);
+}
+
+.fab-new-note svg {
+  width: 22px;
+  height: 22px;
+}
+
+.mobile-tabbar {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  background: var(--surface-raised);
+  border-top: 1px solid var(--border);
+  padding: 6px 4px;
+  padding-bottom: max(6px, env(safe-area-inset-bottom));
+}
+
+.tab-btn {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  border: none;
+  background: none;
+  padding: 6px 2px;
+  border-radius: var(--radius-sm);
+  color: var(--ink-faint);
+  font-size: 0.68rem;
+  cursor: pointer;
+}
+
+.tab-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.tab-btn.is-active {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.mobile-back-btn {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  border: none;
+  background: none;
+  color: var(--ink-soft);
+  font-weight: 600;
+  padding: 4px 0;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.mobile-view-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: var(--bg);
+  flex-direction: column;
+}
+
+.mobile-view-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.mobile-view-header .search-box {
+  flex: 1;
+}
+
+.mobile-view-body {
+  padding: 8px 12px 20px;
+  overflow-y: auto;
+}
+
 @media (max-width: 860px) {
   .app {
     grid-template-columns: 1fr;
@@ -1177,10 +1273,11 @@ dialog::backdrop {
 
   .content-body {
     grid-template-columns: 1fr;
+    padding-bottom: 68px;
   }
 
-  .menu-toggle {
-    display: inline-flex;
+  .sidebar {
+    display: none;
   }
 
   .list-panel {
@@ -1188,35 +1285,64 @@ dialog::backdrop {
     border-bottom: 1px solid var(--border);
   }
 
-  .content-header {
-    flex-wrap: wrap;
-    padding-left: 60px;
+  /* The header's search box and settings button are redundant with the
+     dedicated Search and Settings tabs below, so they're hidden here.
+     (#settings-popover is left alone — it's a child of .list-toolbar,
+     positioned absolutely, and still opens via the Settings tab.) */
+  .list-toolbar .search-box,
+  #settings-btn {
+    display: none;
   }
 
-  #search-input {
-    width: 100%;
+  #new-note-btn {
+    display: none;
   }
 
-  .sidebar {
-    position: fixed;
-    inset: 0 30% 0 0;
-    z-index: 60;
-    transform: translateX(-100%);
-    transition: transform .2s ease;
-    box-shadow: var(--shadow);
-    min-height: 100vh;
+  .fab-new-note {
+    display: flex;
   }
 
-  .sidebar.is-open {
-    transform: translateX(0);
+  .mobile-tabbar {
+    display: flex;
   }
 
-  .sidebar-scrim.is-visible {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background: rgba(17, 21, 27, 0.4);
-    z-index: 50;
+  .feedback {
+    bottom: 84px;
+  }
+
+  .mobile-back-btn {
+    display: flex;
+  }
+
+  .mobile-view-overlay:not([hidden]) {
+    display: flex;
+  }
+
+  /* Single-screen master/detail: show one of list-panel or (detail-panel +
+     actions-panel) at a time instead of stacking both, per main.js's
+     `data-mobile-view` toggle on #app. */
+  .app[data-mobile-view="detail"] .list-panel {
+    display: none;
+  }
+
+  .app[data-mobile-view="list"] .detail-panel,
+  .app[data-mobile-view="list"] .actions-panel {
+    display: none;
+  }
+
+  .app[data-mobile-view="detail"] .fab-new-note {
+    display: none;
+  }
+
+  /* The list's header (title/search/settings) has nothing useful to add
+     once a note fills the whole screen — the back button + note title
+     already orient the user. */
+  .app[data-mobile-view="detail"] .content-header {
+    display: none;
+  }
+
+  .detail-title-input {
+    font-size: 1.3rem;
   }
 }
 
@@ -1230,13 +1356,13 @@ dialog::backdrop {
     padding-right: 16px;
   }
 
-  .content-header {
-    padding-left: 60px;
-  }
-
   .feedback {
     right: 16px;
-    bottom: 16px;
+  }
+
+  .settings-popover {
+    right: 16px;
+    max-width: calc(100vw - 32px);
   }
 }
 
@@ -1596,6 +1722,13 @@ dialog::backdrop {
 
 .note-item-folder:empty {
   display: none;
+}
+
+@media (max-width: 860px) {
+  /* Simplified list item on phones, to match the compact mobile layout. */
+  .note-item-folder {
+    display: none;
+  }
 }
 
 /* Import/export quick actions, pinned under the nav's Archived Notes row */

@@ -121,14 +121,12 @@
   <symbol id="icon-chevron-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <path d="m15 6-6 6 6 6" />
   </symbol>
+  <symbol id="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 5v14M5 12h14" />
+  </symbol>
 </svg>
 
 <div class="app" id="app">
-
-  <button type="button" id="menu-toggle" class="menu-toggle" aria-expanded="false" aria-controls="sidebar">
-    <span class="visually-hidden">Toggle menu</span>
-    <span aria-hidden="true">☰</span>
-  </button>
 
   <aside id="sidebar" class="sidebar scroll-clean">
     <div class="brand">
@@ -197,8 +195,6 @@
       <!-- <p class="hint">Draft notes are saved automatically as you type, and restored if you close the tab. Drag a note onto a folder or onto "Archived Notes" to file it.</p> -->
     </div>
   </aside>
-
-  <div class="sidebar-scrim" id="sidebar-scrim" hidden></div>
 
   <div class="content">
     <header class="content-header">
@@ -307,6 +303,10 @@
       </section>
 
       <main id="detail-panel" class="detail-panel scroll-clean">
+        <button type="button" class="mobile-back-btn" id="mobile-detail-back-btn">
+          <svg aria-hidden="true"><use href="#icon-chevron-left" /></svg> Notes
+        </button>
+
         <form id="note-form" novalidate hidden>
       <input type="hidden" id="note-id" name="id" />
 
@@ -394,6 +394,66 @@
           <svg aria-hidden="true"><use href="#icon-trash" /></svg> Delete Note
         </button>
       </aside>
+    </div>
+  </div>
+
+  <button type="button" class="fab-new-note" id="fab-new-note-btn" aria-label="Create new note">
+    <svg aria-hidden="true"><use href="#icon-plus" /></svg>
+  </button>
+
+  <nav class="mobile-tabbar" id="mobile-tabbar" aria-label="Primary">
+    <button type="button" class="tab-btn is-active" data-tab="home">
+      <svg aria-hidden="true"><use href="#icon-home" /></svg>
+      <span>Home</span>
+    </button>
+    <button type="button" class="tab-btn" data-tab="search">
+      <svg aria-hidden="true"><use href="#icon-search" /></svg>
+      <span>Search</span>
+    </button>
+    <button type="button" class="tab-btn" data-tab="archived">
+      <svg aria-hidden="true"><use href="#icon-archive" /></svg>
+      <span>Archived</span>
+    </button>
+    <button type="button" class="tab-btn" data-tab="tags">
+      <svg aria-hidden="true"><use href="#icon-tag" /></svg>
+      <span>Tags</span>
+    </button>
+    <button type="button" class="tab-btn" data-tab="settings">
+      <svg aria-hidden="true"><use href="#icon-settings" /></svg>
+      <span>Settings</span>
+    </button>
+  </nav>
+
+  <div class="mobile-view-overlay" id="mobile-search-view" hidden>
+    <header class="mobile-view-header">
+      <button type="button" class="icon-btn-square" id="mobile-search-back-btn" aria-label="Back">
+        <svg aria-hidden="true"><use href="#icon-chevron-left" /></svg>
+      </button>
+      <form class="search-box" role="search" id="mobile-search-form">
+        <svg class="search-icon" aria-hidden="true"><use href="#icon-search" /></svg>
+        <label class="visually-hidden" for="mobile-search-input">Search notes</label>
+        <input type="search" id="mobile-search-input" placeholder="Search by title, content, or tags…" autocomplete="off" />
+      </form>
+    </header>
+    <ul class="notes-list scroll-clean" id="mobile-search-results" aria-label="Search results"></ul>
+    <div class="empty-state" id="mobile-search-empty" hidden>
+      <p class="empty-title">Search your notes</p>
+      <p class="empty-body" id="mobile-search-empty-body">Start typing to search by title, content, or tags.</p>
+    </div>
+  </div>
+
+  <div class="mobile-view-overlay" id="mobile-tags-view" hidden>
+    <header class="mobile-view-header">
+      <button type="button" class="icon-btn-square" id="mobile-tags-back-btn" aria-label="Back">
+        <svg aria-hidden="true"><use href="#icon-chevron-left" /></svg>
+      </button>
+      <h2>Folders &amp; Tags</h2>
+    </header>
+    <div class="mobile-view-body scroll-clean">
+      <h3 class="sidebar-heading">Folders</h3>
+      <ul class="folder-list" id="mobile-folder-list" aria-label="Filter by folder"></ul>
+      <h3 class="sidebar-heading">Tags</h3>
+      <ul class="tag-list" id="mobile-tag-list" aria-label="Filter by tag"></ul>
     </div>
   </div>
 

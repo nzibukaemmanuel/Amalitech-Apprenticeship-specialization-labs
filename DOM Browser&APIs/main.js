@@ -312,9 +312,6 @@ function initNotesApp() {
   const notesListEl = document.getElementById('notes-list');
   const tagListEl = document.getElementById('tag-list');
   const folderListEl = document.getElementById('folder-list');
-  const sidebar = document.getElementById('sidebar');
-  const sidebarScrim = document.getElementById('sidebar-scrim');
-  const menuToggle = document.getElementById('menu-toggle');
   const filterButtons = document.querySelectorAll('.filter-btn');
 
   const newNoteBtn = document.getElementById('new-note-btn');
@@ -378,6 +375,24 @@ function initNotesApp() {
   const exportBtn = document.getElementById('export-btn');
   const importBtn = document.getElementById('import-btn');
   const importFileInput = document.getElementById('import-file-input');
+
+  const appEl = document.getElementById('app');
+  const fabNewNoteBtn = document.getElementById('fab-new-note-btn');
+  const mobileTabbar = document.getElementById('mobile-tabbar');
+  const mobileDetailBackBtn = document.getElementById('mobile-detail-back-btn');
+
+  const mobileSearchView = document.getElementById('mobile-search-view');
+  const mobileSearchBackBtn = document.getElementById('mobile-search-back-btn');
+  const mobileSearchForm = document.getElementById('mobile-search-form');
+  const mobileSearchInput = document.getElementById('mobile-search-input');
+  const mobileSearchResults = document.getElementById('mobile-search-results');
+  const mobileSearchEmpty = document.getElementById('mobile-search-empty');
+  const mobileSearchEmptyBody = document.getElementById('mobile-search-empty-body');
+
+  const mobileTagsView = document.getElementById('mobile-tags-view');
+  const mobileTagsBackBtn = document.getElementById('mobile-tags-back-btn');
+  const mobileFolderList = document.getElementById('mobile-folder-list');
+  const mobileTagList = document.getElementById('mobile-tag-list');
 
   // ---------------------------------------------------------------------
   // State
@@ -454,11 +469,17 @@ function initNotesApp() {
     ui.updateFolderList(noteManager.getAllFolders(), state.folder);
     ui.toggleArchiveView(state.filter === 'archived');
     updateHeader();
+    updateMobileTabbar();
   }
 
   // ---------------------------------------------------------------------
   // Detail panel helpers
   // ---------------------------------------------------------------------
+
+  /** On phones, list and detail are separate full-screen steps rather than stacked panels. */
+  function setMobileView(view) {
+    appEl.dataset.mobileView = view;
+  }
 
   function showForm() {
     noteForm.hidden = false;
@@ -487,6 +508,7 @@ function initNotesApp() {
     noteForm.reset();
     setPreviewMode(false);
     ui.showValidationError('note-title', '');
+    setMobileView('list');
     render();
   }
 
@@ -520,6 +542,7 @@ function initNotesApp() {
         label: archived ? 'Archived Notes' : 'All Notes',
         onClick: () => {
           state.filter = archived ? 'archived' : 'all';
+          setMobileView('list');
           render();
         },
       },
@@ -534,6 +557,7 @@ function initNotesApp() {
     setArchiveButtonLabel(note.archived);
     showForm();
     actionsPanel.hidden = false;
+    setMobileView('detail');
     render();
   }
 
@@ -555,6 +579,7 @@ function initNotesApp() {
     restoreDraftIfAny();
     showForm();
     actionsPanel.hidden = true;
+    setMobileView('detail');
     render();
     noteTitleInput.focus();
   }
@@ -709,6 +734,11 @@ function initNotesApp() {
   });
 
   newNoteBtn.addEventListener('click', openCreate);
+  fabNewNoteBtn.addEventListener('click', openCreate);
+  mobileDetailBackBtn.addEventListener('click', () => {
+    if (state.isCreating) storage.clearDraft();
+    closeDetail();
+  });
 
   cancelBtn.addEventListener('click', () => {
     if (state.isCreating) {
@@ -769,20 +799,26 @@ function initNotesApp() {
   // Note list selection + drag & drop (reorder / move to folder / archive)
   // ---------------------------------------------------------------------
 
-  notesListEl.addEventListener('click', (e) => {
-    const item = e.target.closest('.note-item');
-    if (!item) return;
+  /** Shared by the main notes list and the mobile full-screen search results. */
+  function activateNoteListItem(item) {
     const note = noteManager.getNotes().find((n) => n.id === item.dataset.id);
-    if (note) selectNote(note);
-  });
+    if (!note) return;
+    selectNote(note);
+    closeMobileOverlays();
+  }
 
-  notesListEl.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    const item = e.target.closest('.note-item');
-    if (!item) return;
-    e.preventDefault();
-    const note = noteManager.getNotes().find((n) => n.id === item.dataset.id);
-    if (note) selectNote(note);
+  [notesListEl, mobileSearchResults].forEach((list) => {
+    list.addEventListener('click', (e) => {
+      const item = e.target.closest('.note-item');
+      if (item) activateNoteListItem(item);
+    });
+    list.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const item = e.target.closest('.note-item');
+      if (!item) return;
+      e.preventDefault();
+      activateNoteListItem(item);
+    });
   });
 
   notesListEl.addEventListener('dragstart', (e) => {
@@ -1059,56 +1095,47 @@ function initNotesApp() {
   document.getElementById('search-form').addEventListener('submit', (e) => e.preventDefault());
 
   // ---------------------------------------------------------------------
-  // Sidebar: view filter (all / archived), tag filter, folder filter
+  // Sidebar: view filter (all / archived), tag filter, folder filter.
+  // Shared by the desktop sidebar and the mobile Tags full-screen view.
   // ---------------------------------------------------------------------
 
+  function selectFilter(filter) {
+    state.filter = filter;
+    setMobileView('list');
+    render();
+  }
+
+  function selectTag(tag) {
+    state.tag = state.tag === tag ? null : tag;
+    closeMobileOverlays();
+    setMobileView('list');
+    render();
+  }
+
+  function selectFolder(folder) {
+    state.folder = state.folder === folder ? null : folder;
+    closeMobileOverlays();
+    setMobileView('list');
+    render();
+  }
+
   filterButtons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      state.filter = btn.dataset.filter;
-      render();
-      closeSidebarOnMobile();
+    btn.addEventListener('click', () => selectFilter(btn.dataset.filter));
+  });
+
+  [tagListEl, mobileTagList].forEach((list) => {
+    list.addEventListener('click', (e) => {
+      const chip = e.target.closest('.tag-chip');
+      if (chip) selectTag(chip.dataset.tag);
     });
   });
 
-  tagListEl.addEventListener('click', (e) => {
-    const chip = e.target.closest('.tag-chip');
-    if (!chip) return;
-    const tag = chip.dataset.tag;
-    state.tag = state.tag === tag ? null : tag;
-    render();
-    closeSidebarOnMobile();
+  [folderListEl, mobileFolderList].forEach((list) => {
+    list.addEventListener('click', (e) => {
+      const chip = e.target.closest('.folder-chip');
+      if (chip) selectFolder(chip.dataset.folder);
+    });
   });
-
-  folderListEl.addEventListener('click', (e) => {
-    const chip = e.target.closest('.folder-chip');
-    if (!chip) return;
-    const folder = chip.dataset.folder;
-    state.folder = state.folder === folder ? null : folder;
-    render();
-    closeSidebarOnMobile();
-  });
-
-  // ---------------------------------------------------------------------
-  // Mobile sidebar toggle
-  // ---------------------------------------------------------------------
-
-  function openSidebarOnMobile() {
-    sidebar.classList.add('is-open');
-    sidebarScrim.hidden = false;
-    requestAnimationFrame(() => sidebarScrim.classList.add('is-visible'));
-    menuToggle.setAttribute('aria-expanded', 'true');
-  }
-  function closeSidebarOnMobile() {
-    sidebar.classList.remove('is-open');
-    sidebarScrim.classList.remove('is-visible');
-    sidebarScrim.hidden = true;
-    menuToggle.setAttribute('aria-expanded', 'false');
-  }
-  menuToggle.addEventListener('click', () => {
-    const isOpen = sidebar.classList.contains('is-open');
-    isOpen ? closeSidebarOnMobile() : openSidebarOnMobile();
-  });
-  sidebarScrim.addEventListener('click', closeSidebarOnMobile);
 
   // ---------------------------------------------------------------------
   // Settings popover (theme + font)
@@ -1124,10 +1151,12 @@ function initNotesApp() {
     settingsPopover.hidden = false;
     showSettingsPanel('root');
     settingsBtn.setAttribute('aria-expanded', 'true');
+    updateMobileTabbar();
   }
   function closeSettingsPopover() {
     settingsPopover.hidden = true;
     settingsBtn.setAttribute('aria-expanded', 'false');
+    updateMobileTabbar();
   }
   settingsBtn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -1167,12 +1196,91 @@ function initNotesApp() {
   });
 
   // ---------------------------------------------------------------------
+  // Mobile navigation: bottom tab bar, FAB, and the Search/Tags full-screen
+  // views that replace the desktop sidebar's search box and tag/folder list
+  // on phones (see the `@media (max-width: 860px)` rules in styles.css).
+  // ---------------------------------------------------------------------
+
+  function closeMobileOverlays() {
+    mobileSearchView.hidden = true;
+    mobileTagsView.hidden = true;
+    updateMobileTabbar();
+  }
+
+  function updateMobileTabbar() {
+    let active = state.filter === 'archived' ? 'archived' : 'home';
+    if (!mobileSearchView.hidden) active = 'search';
+    else if (!mobileTagsView.hidden) active = 'tags';
+    else if (!settingsPopover.hidden) active = 'settings';
+
+    mobileTabbar.querySelectorAll('.tab-btn').forEach((btn) => {
+      btn.classList.toggle('is-active', btn.dataset.tab === active);
+    });
+  }
+
+  function renderMobileSearchResults() {
+    const query = mobileSearchInput.value.trim();
+    const list = query ? noteManager.searchNotes(query) : [];
+    ui.renderNotesList(list, {
+      highlight: query,
+      emptyMessage: query ? `No notes match "${query}".` : 'Start typing to search your notes.',
+      selectedId: state.selectedId,
+      listEl: mobileSearchResults,
+      emptyStateEl: mobileSearchEmpty,
+      emptyBodyEl: mobileSearchEmptyBody,
+    });
+  }
+
+  function openMobileSearch() {
+    mobileSearchView.hidden = false;
+    renderMobileSearchResults();
+    updateMobileTabbar();
+    mobileSearchInput.focus();
+  }
+
+  function openMobileTags() {
+    mobileTagsView.hidden = false;
+    ui.updateFolderList(noteManager.getAllFolders(), state.folder, { listEl: mobileFolderList });
+    ui.updateTagList(noteManager.getAllTags(), state.tag, { listEl: mobileTagList });
+    updateMobileTabbar();
+  }
+
+  let mobileSearchTimeout = null;
+  mobileSearchInput.addEventListener('input', () => {
+    clearTimeout(mobileSearchTimeout);
+    mobileSearchTimeout = setTimeout(renderMobileSearchResults, 150);
+  });
+  mobileSearchForm.addEventListener('submit', (e) => e.preventDefault());
+  mobileSearchBackBtn.addEventListener('click', closeMobileOverlays);
+  mobileTagsBackBtn.addEventListener('click', closeMobileOverlays);
+
+  mobileTabbar.addEventListener('click', (e) => {
+    const btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+    const tab = btn.dataset.tab;
+
+    if (tab === 'settings') {
+      e.stopPropagation(); // otherwise the document click-outside listener below closes it right back
+      closeMobileOverlays();
+      settingsPopover.hidden ? openSettingsPopover() : closeSettingsPopover();
+      return;
+    }
+
+    closeMobileOverlays();
+    closeSettingsPopover();
+    if (tab === 'home') selectFilter('all');
+    else if (tab === 'archived') selectFilter('archived');
+    else if (tab === 'search') openMobileSearch();
+    else if (tab === 'tags') openMobileTags();
+  });
+
+  // ---------------------------------------------------------------------
   // Keyboard: Escape closes whichever overlay is open.
   // ---------------------------------------------------------------------
 
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
-    if (sidebar.classList.contains('is-open')) closeSidebarOnMobile();
+    if (!mobileSearchView.hidden || !mobileTagsView.hidden) closeMobileOverlays();
     if (!settingsPopover.hidden) closeSettingsPopover();
   });
 
@@ -1226,6 +1334,7 @@ function initNotesApp() {
     setActiveSegment(fontSelect, prefs.font);
     noteManager.init();
     populateFolderSelect();
+    setMobileView('list');
     render();
     checkForSharedNoteLink();
 

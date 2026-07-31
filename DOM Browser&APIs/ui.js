@@ -128,39 +128,47 @@ export const renderNoteItem = (note, { highlight = '', selected = false } = {}) 
 const MAX_VISIBLE_NOTES = 7;
 
 export const renderNotesList = (notes, meta = {}) => {
-  const { highlight = '', emptyMessage, selectedId = null } = meta;
-  notesListEl.innerHTML = '';
-  notesListEl.classList.remove('is-scrollable');
-  notesListEl.style.maxHeight = '';
+  const {
+    highlight = '',
+    emptyMessage,
+    selectedId = null,
+    listEl = notesListEl,
+    emptyStateEl = emptyState,
+    emptyBodyEl = emptyBody,
+  } = meta;
+  listEl.innerHTML = '';
+  listEl.classList.remove('is-scrollable');
+  listEl.style.maxHeight = '';
 
   if (notes.length === 0) {
-    emptyState.hidden = false;
-    if (emptyMessage) emptyBody.textContent = emptyMessage;
+    if (emptyStateEl) emptyStateEl.hidden = false;
+    if (emptyMessage && emptyBodyEl) emptyBodyEl.textContent = emptyMessage;
     return;
   }
 
-  emptyState.hidden = true;
+  if (emptyStateEl) emptyStateEl.hidden = true;
   const fragment = document.createDocumentFragment();
   notes.forEach((note) =>
     fragment.appendChild(renderNoteItem(note, { highlight, selected: note.id === selectedId }))
   );
-  notesListEl.appendChild(fragment);
+  listEl.appendChild(fragment);
 
-  if (notes.length > MAX_VISIBLE_NOTES) {
-    const cutoffItem = notesListEl.children[MAX_VISIBLE_NOTES];
-    notesListEl.style.maxHeight = `${cutoffItem.offsetTop}px`;
-    notesListEl.classList.add('is-scrollable');
+  if (listEl === notesListEl && notes.length > MAX_VISIBLE_NOTES) {
+    const cutoffItem = listEl.children[MAX_VISIBLE_NOTES];
+    listEl.style.maxHeight = `${cutoffItem.offsetTop}px`;
+    listEl.classList.add('is-scrollable');
   }
 };
 
-/** Render the tag sidebar list; `activeTag` gets the active style. */
-export const updateTagList = (tags, activeTag = null) => {
-  tagListEl.innerHTML = '';
+/** Render a tag chip list (sidebar or the mobile full-screen Tags view); `activeTag` gets the active style. */
+export const updateTagList = (tags, activeTag = null, { listEl = tagListEl } = {}) => {
+  if (!listEl) return;
+  listEl.innerHTML = '';
   if (tags.length === 0) {
     const li = document.createElement('li');
     li.className = 'hint';
     li.textContent = 'Tags you add to notes will show up here.';
-    tagListEl.appendChild(li);
+    listEl.appendChild(li);
     return;
   }
 
@@ -184,14 +192,14 @@ export const updateTagList = (tags, activeTag = null) => {
 
     btn.append(icon, name);
     li.appendChild(btn);
-    tagListEl.appendChild(li);
+    listEl.appendChild(li);
   });
 };
 
-/** Render the folder/category sidebar list (bonus); `activeFolder` gets the active style. */
-export const updateFolderList = (folders, activeFolder = null) => {
-  if (!folderListEl) return;
-  folderListEl.innerHTML = '';
+/** Render a folder/category chip list (sidebar or the mobile full-screen Tags view); `activeFolder` gets the active style. */
+export const updateFolderList = (folders, activeFolder = null, { listEl = folderListEl } = {}) => {
+  if (!listEl) return;
+  listEl.innerHTML = '';
 
   folders.forEach((folder) => {
     const li = document.createElement('li');
@@ -214,7 +222,7 @@ export const updateFolderList = (folders, activeFolder = null) => {
 
     btn.append(icon, name);
     li.appendChild(btn);
-    folderListEl.appendChild(li);
+    listEl.appendChild(li);
   });
 };
 
