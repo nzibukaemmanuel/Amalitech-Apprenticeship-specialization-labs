@@ -23,9 +23,6 @@ export const applyTheme = (themeName, { persist = true } = {}) => {
   root.setAttribute('data-theme', resolveTheme(theme));
   root.setAttribute('data-theme-mode', theme);
 
-  const select = document.getElementById('theme-select');
-  if (select) select.value = theme;
-
   if (persist) {
     const prefs = storage.loadPreferences();
     storage.savePreferences({ ...prefs, theme });
@@ -37,15 +34,18 @@ export const applyFont = (fontName, { persist = true } = {}) => {
   const font = VALID_FONTS.includes(fontName) ? fontName : 'sans';
   root.setAttribute('data-font', font);
 
-  const select = document.getElementById('font-select');
-  if (select) select.value = font;
-
   if (persist) {
     const prefs = storage.loadPreferences();
     storage.savePreferences({ ...prefs, font });
   }
   return font;
 };
+
+/** The currently applied theme mode ('light' | 'dark' | 'auto'). */
+export const getThemeMode = () => root.getAttribute('data-theme-mode') || 'light';
+
+/** The currently applied font. */
+export const getFont = () => root.getAttribute('data-font') || 'sans';
 
 // While the theme mode is 'auto', keep the app in sync if the OS setting
 // changes mid-session (bonus: dark-mode auto-detection).
