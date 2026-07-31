@@ -45,6 +45,7 @@ another script.
 - **Archive view**: separate "All notes" / "Archived" views with counts; drag a note onto "Archived Notes" / "All Notes" to (un)archive it.
 - **Drag & drop (bonus)**: reorder notes in the list, or drag onto the archive target as above.
 - **Drafts**: while creating a new note, title/content/tags autosave to `sessionStorage` every 300ms and are restored if you reload or reopen the tab; cleared on successful save.
+- **Export / Import (bonus)**: export all notes as a `.json` file; import validates each entry (title/content shape) before merging it in, and skips anything already present — matched by id, or by a title+content fingerprint for re-imports that got a new id — so duplicates never pile up.
 - **Dark mode auto-detection (bonus)**: a new "Auto" theme option (alongside Light/Dark) follows the OS/browser `prefers-color-scheme` setting live; it's also the default for a first-time visitor.
 - **Offline support (bonus)**: a service worker caches the app shell, so the app (and its `localStorage` data) still opens with no connection.
 - **Geolocation (bonus)**: "Add my location" button uses `navigator.geolocation`, attempts reverse geocoding to a city name (falls back to raw coordinates), and handles permission denial/timeouts gracefully.

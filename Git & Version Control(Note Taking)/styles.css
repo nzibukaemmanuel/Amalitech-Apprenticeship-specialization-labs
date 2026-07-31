@@ -1429,8 +1429,57 @@ dialog::backdrop {
 }
 
 /* ==========================================================================
-   Bonus features — drag & drop, PWA install button
+   Bonus features — export/import, drag & drop, PWA install button
    ========================================================================== */
+
+/* Import/export quick actions, pinned under the nav's "All Notes" row */
+.io-actions {
+  display: flex;
+  align-items: stretch;
+  margin: 2px 0 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.io-action-btn {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 9px 8px;
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.io-action-btn svg {
+  width: 15px;
+  height: 15px;
+  color: inherit;
+}
+
+.io-action-btn:hover {
+  background: var(--bg-alt);
+  color: var(--accent);
+}
+
+.io-action-btn:active {
+  background: var(--border-soft);
+}
+
+.io-action-divider {
+  width: 1px;
+  flex: 0 0 auto;
+  background: var(--border);
+}
 
 /* Drag & drop affordances */
 .note-item {
