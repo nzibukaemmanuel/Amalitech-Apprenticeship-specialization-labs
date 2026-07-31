@@ -21,7 +21,7 @@ nothing more:
 |---|---|
 | `storage.js` | All `localStorage`/`sessionStorage` reads & writes: notes, preferences, drafts, and (for the demo login system) accounts/session/reset-requests. Only place that touches Web Storage. |
 | `noteManager.js` | `Note` class + in-memory notes array; create/update/delete/search/filter/reorder. Persists via `storage.js` after every mutation. |
-| `ui.js` | Pure rendering: note cards, the tag sidebar, validation messages, toasts. Never touches storage. |
+| `ui.js` | Pure rendering: note cards, the tag/category sidebars, validation messages, toasts. Never touches storage. |
 | `themes.js` | Applies/persists color theme (light/dark/auto) and font family (sans/serif/mono). |
 | `main.js` | The single entry point every page loads. Detects which page it's on and wires up only that page: the notes app (`index.html`), or one of the four auth pages (login/signup/forgot-password/reset-password). |
 
@@ -41,10 +41,11 @@ another script.
 
 - **CRUD**: create, edit (modal), archive/unarchive, delete (with confirm dialog), all synced to `localStorage`.
 - **Tags**: comma-separated tag input, deduped, sidebar tag filter, click a tag again to clear it.
+- **Categories (bonus)**: assign a note to a category from the editor (or create a new one inline via "+ New category…"), filter notes by category in the sidebar, and see the active category as a badge on each note card.
 - **Search**: live filtering across title/content/tags, with match highlighting (`<mark>`).
 - **Archive view**: separate "All notes" / "Archived" views with counts; drag a note onto "Archived Notes" / "All Notes" to (un)archive it.
 - **Drag & drop (bonus)**: reorder notes in the list, or drag onto the archive target as above.
-- **Drafts**: while creating a new note, title/content/tags autosave to `sessionStorage` every 300ms and are restored if you reload or reopen the tab; cleared on successful save.
+- **Drafts**: while creating a new note, title/content/tags/category autosave to `sessionStorage` every 300ms and are restored if you reload or reopen the tab; cleared on successful save.
 - **Dark mode auto-detection (bonus)**: a new "Auto" theme option (alongside Light/Dark) follows the OS/browser `prefers-color-scheme` setting live; it's also the default for a first-time visitor.
 - **Offline support (bonus)**: a service worker caches the app shell, so the app (and its `localStorage` data) still opens with no connection.
 - **Geolocation (bonus)**: "Add my location" button uses `navigator.geolocation`, attempts reverse geocoding to a city name (falls back to raw coordinates), and handles permission denial/timeouts gracefully.

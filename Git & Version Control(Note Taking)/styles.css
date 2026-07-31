@@ -384,6 +384,53 @@ svg {
   text-transform: capitalize;
 }
 
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-bottom: 10px;
+}
+
+.category-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 5px 10px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  color: var(--ink-soft);
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.86rem;
+}
+
+.category-chip:hover {
+  background: var(--border-soft);
+}
+
+.category-chip.is-active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.category-chip svg {
+  color: var(--ink-faint);
+  flex-shrink: 0;
+}
+
+.category-chip.is-active svg {
+  color: #fff;
+}
+
+.category-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .sidebar-footer {
   margin-top: auto;
 }
@@ -745,6 +792,20 @@ svg {
   color: var(--ink-soft);
 }
 
+.note-item-category {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+  margin-bottom: 2px;
+}
+
+.note-item-category:empty {
+  display: none;
+}
+
 .note-item-title {
   font-size: 1rem;
   font-weight: 700;
@@ -900,6 +961,24 @@ mark {
 
 .meta-row input::placeholder {
   color: var(--ink-faint);
+}
+
+.meta-row select {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  padding: 2px 0;
+  font-size: inherit;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.meta-row select:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 #note-last-edited {

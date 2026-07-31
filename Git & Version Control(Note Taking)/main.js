@@ -332,6 +332,7 @@ function initNotesApp() {
   const searchInput = document.getElementById('search-input');
   const notesListEl = document.getElementById('notes-list');
   const tagListEl = document.getElementById('tag-list');
+  const categoryListEl = document.getElementById('category-list');
   const sidebar = document.getElementById('sidebar');
   const sidebarScrim = document.getElementById('sidebar-scrim');
   const menuToggle = document.getElementById('menu-toggle');
@@ -347,6 +348,7 @@ function initNotesApp() {
   const noteTitleInput = document.getElementById('note-title');
   const noteContentInput = document.getElementById('note-content');
   const noteTagsInput = document.getElementById('note-tags');
+  const noteCategorySelect = document.getElementById('note-category');
   const lastEditedRow = document.getElementById('last-edited-row');
   const lastEditedEl = document.getElementById('note-last-edited');
 
@@ -381,6 +383,7 @@ function initNotesApp() {
   const state = {
     filter: 'all',        // 'all' | 'archived'
     tag: null,             // string | null
+    category: null,        // string | null
     search: '',
     selectedId: null,      // note id currently shown in the detail panel
     isCreating: false,     // true while composing a brand-new (unsaved) note
@@ -396,12 +399,14 @@ function initNotesApp() {
   function getVisibleNotes() {
     let list = noteManager.filterByArchived(state.filter === 'archived');
     if (state.tag) list = noteManager.filterByTag(state.tag, list);
+    if (state.category) list = noteManager.filterByCategory(state.category, list);
     if (state.search) list = noteManager.searchNotes(state.search, list);
     return [...list].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   }
 
   function emptyMessage() {
     if (state.search) return `No notes match "${state.search}".`;
+    if (state.category) return `No notes in ${state.category} yet.`;
     if (state.tag) return `No notes tagged ${state.tag} yet.`;
     if (state.filter === 'archived') return 'Nothing archived. Notes you archive will land here.';
     return 'Write your first note — it takes less time than finding a pen.';
@@ -410,9 +415,28 @@ function initNotesApp() {
   function updateHeader() {
     viewTitle.textContent = state.filter === 'archived' ? 'Archived Notes' : 'All Notes';
     const parts = [];
+    if (state.category) parts.push(`in ${state.category}`);
     if (state.tag) parts.push(`tagged ${state.tag}`);
     if (state.search) parts.push(`matching "${state.search}"`);
     viewSubtitle.textContent = parts.join(' · ');
+  }
+
+  /** Rebuild the category <select> options from every category currently in use, plus a "+ New category…" escape hatch. */
+  function populateCategorySelect() {
+    const categories = noteManager.getAllCategories();
+    const current = noteCategorySelect.value;
+    noteCategorySelect.innerHTML = '';
+    categories.forEach((category) => {
+      const opt = document.createElement('option');
+      opt.value = category;
+      opt.textContent = category;
+      noteCategorySelect.appendChild(opt);
+    });
+    const newOpt = document.createElement('option');
+    newOpt.value = '__new__';
+    newOpt.textContent = '+ New category…';
+    noteCategorySelect.appendChild(newOpt);
+    if (categories.includes(current)) noteCategorySelect.value = current;
   }
 
   function render() {
@@ -423,6 +447,7 @@ function initNotesApp() {
       selectedId: state.selectedId,
     });
     ui.updateTagList(noteManager.getAllTags(), state.tag);
+    ui.updateCategoryList(noteManager.getAllCategories(), state.category);
     ui.toggleArchiveView(state.filter === 'archived');
     updateHeader();
   }
@@ -453,6 +478,8 @@ function initNotesApp() {
     noteTitleInput.value = note.title;
     noteContentInput.value = note.content;
     noteTagsInput.value = note.tags.join(', ');
+    populateCategorySelect();
+    noteCategorySelect.value = note.category || 'Uncategorized';
     lastEditedRow.hidden = false;
     lastEditedEl.textContent = new Date(note.updatedAt || note.createdAt).toLocaleDateString(undefined, {
       year: 'numeric', month: 'short', day: 'numeric',
@@ -486,6 +513,8 @@ function initNotesApp() {
 
     noteForm.reset();
     noteIdInput.value = '';
+    populateCategorySelect();
+    noteCategorySelect.value = 'Uncategorized';
     lastEditedRow.hidden = true;
     locationDisplay.textContent = '';
     ui.showValidationError('note-title', '');
@@ -536,6 +565,7 @@ function initNotesApp() {
         title: noteTitleInput.value,
         content: noteContentInput.value,
         tags: noteTagsInput.value,
+        category: noteCategorySelect.value,
       };
       if (draft.title || draft.content || draft.tags) {
         storage.saveDraft(draft);
@@ -551,11 +581,24 @@ function initNotesApp() {
     noteTitleInput.value = draft.title || '';
     noteContentInput.value = draft.content || '';
     noteTagsInput.value = draft.tags || '';
+    if (draft.category) noteCategorySelect.value = draft.category;
     saveBtn.disabled = !isTitleValid();
     if (draft.title || draft.content) {
       ui.showFeedback('Restored your unsaved draft.');
     }
   }
+
+  // ---------------------------------------------------------------------
+  // Category select: "+ New category…" prompts for a name
+  // ---------------------------------------------------------------------
+
+  noteCategorySelect.addEventListener('change', () => {
+    if (noteCategorySelect.value !== '__new__') { autosaveDraft(); return; }
+    const name = window.prompt('New category name:');
+    populateCategorySelect();
+    noteCategorySelect.value = name && name.trim() ? name.trim() : 'Uncategorized';
+    autosaveDraft();
+  });
 
   // ---------------------------------------------------------------------
   // Form submit (create / update) + cancel
@@ -571,9 +614,10 @@ function initNotesApp() {
     const title = noteTitleInput.value.trim();
     const content = noteContentInput.value.trim();
     const tags = noteTagsInput.value;
+    const category = noteCategorySelect.value === '__new__' ? 'Uncategorized' : noteCategorySelect.value;
 
     if (state.isCreating) {
-      const note = noteManager.createNote(title, content, tags);
+      const note = noteManager.createNote(title, content, tags, category);
       if (state.pendingLocation) {
         noteManager.updateNote(note.id, { location: state.pendingLocation });
       }
@@ -581,7 +625,7 @@ function initNotesApp() {
       ui.showFeedback('Note saved.');
       selectNote(noteManager.getNotes().find((n) => n.id === note.id));
     } else if (state.selectedId) {
-      noteManager.updateNote(state.selectedId, { title, content, tags, location: state.pendingLocation });
+      noteManager.updateNote(state.selectedId, { title, content, tags, category, location: state.pendingLocation });
       ui.showFeedback('Note updated.');
       selectNote(noteManager.getNotes().find((n) => n.id === state.selectedId));
     }
@@ -773,7 +817,7 @@ function initNotesApp() {
   document.getElementById('search-form').addEventListener('submit', (e) => e.preventDefault());
 
   // ---------------------------------------------------------------------
-  // Sidebar: view filter (all / archived), tag filter
+  // Sidebar: view filter (all / archived), tag filter, category filter
   // ---------------------------------------------------------------------
 
   filterButtons.forEach((btn) => {
@@ -789,6 +833,15 @@ function initNotesApp() {
     if (!chip) return;
     const tag = chip.dataset.tag;
     state.tag = state.tag === tag ? null : tag;
+    render();
+    closeSidebarOnMobile();
+  });
+
+  categoryListEl.addEventListener('click', (e) => {
+    const chip = e.target.closest('.category-chip');
+    if (!chip) return;
+    const category = chip.dataset.category;
+    state.category = state.category === category ? null : category;
     render();
     closeSidebarOnMobile();
   });
@@ -928,6 +981,7 @@ function initNotesApp() {
     setActiveSegment(themeSelect, prefs.theme);
     setActiveSegment(fontSelect, prefs.font);
     noteManager.init();
+    populateCategorySelect();
     render();
 
     // If a draft exists from a previous session, let the user know they can

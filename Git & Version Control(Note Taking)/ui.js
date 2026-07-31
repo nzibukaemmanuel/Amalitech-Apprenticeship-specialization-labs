@@ -7,6 +7,7 @@ const emptyState = document.getElementById('empty-state');
 const emptyBody = document.getElementById('empty-body');
 const itemTemplate = document.getElementById('note-item-template');
 const tagListEl = document.getElementById('tag-list');
+const categoryListEl = document.getElementById('category-list');
 const feedbackEl = document.getElementById('feedback');
 
 const formatDate = (iso) => {
@@ -45,6 +46,9 @@ export const renderNoteItem = (note, { highlight = '', selected = false } = {}) 
   el.classList.toggle('is-archived', Boolean(note.archived));
   el.setAttribute('aria-selected', String(selected));
   el.setAttribute('draggable', 'true');
+
+  const categoryEl = el.querySelector('.note-item-category');
+  if (categoryEl) categoryEl.textContent = note.category && note.category !== 'Uncategorized' ? note.category : '';
 
   const titleEl = el.querySelector('.note-item-title');
   titleEl.textContent = '';
@@ -130,6 +134,35 @@ export const updateTagList = (tags, activeTag = null) => {
     btn.append(icon, name);
     li.appendChild(btn);
     tagListEl.appendChild(li);
+  });
+};
+
+/** Render the category sidebar list; `activeCategory` gets the active style. */
+export const updateCategoryList = (categories, activeCategory = null) => {
+  if (!categoryListEl) return;
+  categoryListEl.innerHTML = '';
+
+  categories.forEach((category) => {
+    const li = document.createElement('li');
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'category-chip';
+    btn.dataset.category = category;
+    if (category === activeCategory) btn.classList.add('is-active');
+
+    const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    icon.setAttribute('aria-hidden', 'true');
+    const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    use.setAttribute('href', '#icon-category');
+    icon.appendChild(use);
+
+    const name = document.createElement('span');
+    name.className = 'category-name';
+    name.textContent = category;
+
+    btn.append(icon, name);
+    li.appendChild(btn);
+    categoryListEl.appendChild(li);
   });
 };
 
