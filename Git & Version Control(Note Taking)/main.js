@@ -374,10 +374,6 @@ function initNotesApp() {
   const viewTitle = document.getElementById('view-title');
   const viewSubtitle = document.getElementById('view-subtitle');
 
-  const exportBtn = document.getElementById('export-btn');
-  const importBtn = document.getElementById('import-btn');
-  const importFileInput = document.getElementById('import-file-input');
-
   // ---------------------------------------------------------------------
   // State
   // ---------------------------------------------------------------------
@@ -760,56 +756,6 @@ function initNotesApp() {
   });
   confirmModal.addEventListener('close', () => {
     state.pendingDeleteId = null;
-  });
-
-  // ---------------------------------------------------------------------
-  // Export / Import JSON (bonus)
-  // ---------------------------------------------------------------------
-
-  exportBtn.addEventListener('click', () => {
-    const data = JSON.stringify(noteManager.getNotes(), null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    const date = new Date().toISOString().slice(0, 10);
-    a.href = url;
-    a.download = `notes-export-${date}.json`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-    ui.showFeedback('Notes exported.');
-  });
-
-  importBtn.addEventListener('click', () => importFileInput.click());
-  importFileInput.addEventListener('change', () => {
-    const file = importFileInput.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const parsed = JSON.parse(String(reader.result));
-        const list = Array.isArray(parsed) ? parsed : parsed.notes;
-        if (!Array.isArray(list)) throw new Error('Expected an array of notes.');
-
-        const { added, skipped } = noteManager.mergeIn(list);
-        if (added === 0) {
-          ui.showFeedback(
-            skipped ? `No notes imported — ${skipped} entr${skipped === 1 ? 'y was' : 'ies were'} invalid or already in your notes.` : 'That file has no notes in it.',
-            { type: 'error' }
-          );
-        } else {
-          const skippedNote = skipped ? ` (${skipped} skipped as invalid or duplicate)` : '';
-          ui.showFeedback(`Imported ${added} note${added === 1 ? '' : 's'}.${skippedNote}`);
-        }
-        render();
-      } catch {
-        ui.showFeedback('That file is not a valid notes export.', { type: 'error' });
-      } finally {
-        importFileInput.value = '';
-      }
-    };
-    reader.readAsText(file);
   });
 
   // ---------------------------------------------------------------------
