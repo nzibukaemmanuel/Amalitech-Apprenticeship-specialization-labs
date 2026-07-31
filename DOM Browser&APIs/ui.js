@@ -226,18 +226,68 @@ export const showValidationError = (fieldId, message) => {
   if (errorEl) errorEl.textContent = message || '';
 };
 
-let toastTimeout = null;
-export const showFeedback = (message, { type = 'info', duration = 3200 } = {}) => {
-  feedbackEl.innerHTML = '';
+const makeIcon = (href) => {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('aria-hidden', 'true');
+  const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+  use.setAttribute('href', href);
+  svg.appendChild(use);
+  return svg;
+};
+
+/**
+ * Show a toast in the bottom-right stack. Toasts persist independently of
+ * one another (each has its own auto-dismiss timer) so several can be
+ * visible at once, newest at the bottom of the stack.
+ *
+ * `action`, if given, renders an underlined link before the close button —
+ * e.g. { label: 'Archived Notes', onClick: () => ... } — and dismisses the
+ * toast when clicked.
+ */
+export const showFeedback = (message, { type = 'info', duration = 4000, action } = {}) => {
+  if (!feedbackEl) return;
+
   const toast = document.createElement('div');
   toast.className = `toast${type === 'error' ? ' toast-error' : ''}`;
-  toast.textContent = message;
-  feedbackEl.appendChild(toast);
+  toast.setAttribute('role', 'status');
 
-  clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => {
-    feedbackEl.innerHTML = '';
-  }, duration);
+  const icon = document.createElement('span');
+  icon.className = 'toast-icon';
+  icon.appendChild(makeIcon(type === 'error' ? '#icon-close' : '#icon-check'));
+
+  const messageEl = document.createElement('span');
+  messageEl.className = 'toast-message';
+  messageEl.textContent = message;
+
+  const dismiss = () => {
+    clearTimeout(timeoutId);
+    toast.remove();
+  };
+
+  toast.append(icon, messageEl);
+
+  if (action) {
+    const actionBtn = document.createElement('button');
+    actionBtn.type = 'button';
+    actionBtn.className = 'toast-action';
+    actionBtn.textContent = action.label;
+    actionBtn.addEventListener('click', () => {
+      action.onClick?.();
+      dismiss();
+    });
+    toast.appendChild(actionBtn);
+  }
+
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.className = 'toast-close';
+  closeBtn.setAttribute('aria-label', 'Dismiss');
+  closeBtn.appendChild(makeIcon('#icon-close'));
+  closeBtn.addEventListener('click', dismiss);
+  toast.appendChild(closeBtn);
+
+  feedbackEl.appendChild(toast);
+  const timeoutId = setTimeout(dismiss, duration);
 };
 
 export const toggleArchiveView = (isArchivedView) => {

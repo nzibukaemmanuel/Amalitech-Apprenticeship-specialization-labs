@@ -4,12 +4,7 @@
 // project needs just five JS modules (storage.js, noteManager.js, ui.js,
 // themes.js, main.js) instead of one file per page.
 //
-//   - index.html                -> initNotesApp()   (the note-taking app)
-//   - login.html                -> initLoginPage()
-//   - signup.html                -> initSignupPage()
-//   - forgot-password.html      -> initForgotPasswordPage()
-//   - reset-password.html       -> initResetPasswordPage()
-
+// 
 import * as storage from './storage.js';
 import * as noteManager from './noteManager.js';
 import * as ui from './ui.js';
@@ -55,28 +50,16 @@ const setFieldError = (input, errorEl, message) => {
   if (errorEl) errorEl.textContent = message || '';
 };
 
-let authToastTimeout = null;
-const showAuthFeedback = (feedbackEl, message, { type = 'info', duration = 3200 } = {}) => {
-  feedbackEl.innerHTML = '';
-  const toast = document.createElement('div');
-  toast.className = `toast${type === 'error' ? ' toast-error' : ''}`;
-  toast.textContent = message;
-  feedbackEl.appendChild(toast);
-
-  clearTimeout(authToastTimeout);
-  authToastTimeout = setTimeout(() => { feedbackEl.innerHTML = ''; }, duration);
-};
-
 /** login.html/signup.html only make sense signed out — bounce an existing session straight in. */
 const redirectIfAuthenticated = () => {
   if (storage.loadSession()) window.location.replace('index.html');
 };
 
 /** Every auth page's "Google" button does the same not-really-implemented thing. */
-const wireGoogleButton = (btn, feedbackEl) => {
+const wireGoogleButton = (btn) => {
   if (!btn) return;
   btn.addEventListener('click', () => {
-    showAuthFeedback(feedbackEl, "Google sign-in isn't available in this demo.", { type: 'error' });
+    ui.showFeedback("Google sign-in isn't available in this demo.", { type: 'error' });
   });
 };
 
@@ -94,7 +77,6 @@ function initLoginPage() {
   const passwordInput = document.getElementById('password');
   const passwordError = document.getElementById('password-error');
   const passwordToggle = document.getElementById('password-toggle');
-  const feedbackEl = document.getElementById('feedback');
   const googleBtn = document.getElementById('google-btn');
 
   initPasswordToggle(passwordToggle, passwordInput);
@@ -127,17 +109,17 @@ function initLoginPage() {
     const passwordHash = await hashPassword(password);
 
     if (!user || user.passwordHash !== passwordHash) {
-      showAuthFeedback(feedbackEl, 'Incorrect email or password.', { type: 'error' });
+      ui.showFeedback('Incorrect email or password.', { type: 'error' });
       passwordInput.focus();
       return;
     }
 
     storage.saveSession(email);
-    showAuthFeedback(feedbackEl, 'Welcome back! Redirecting…');
+    ui.showFeedback('Welcome back! Redirecting…');
     setTimeout(() => { window.location.href = 'index.html'; }, 500);
   });
 
-  wireGoogleButton(googleBtn, feedbackEl);
+  wireGoogleButton(googleBtn);
 }
 
 // ============================================================================
@@ -154,7 +136,6 @@ function initSignupPage() {
   const passwordInput = document.getElementById('password');
   const passwordError = document.getElementById('password-error');
   const passwordToggle = document.getElementById('password-toggle');
-  const feedbackEl = document.getElementById('feedback');
   const googleBtn = document.getElementById('google-btn');
 
   initPasswordToggle(passwordToggle, passwordInput);
@@ -197,11 +178,11 @@ function initSignupPage() {
     storage.addUser({ email, passwordHash });
     storage.saveSession(email);
 
-    showAuthFeedback(feedbackEl, 'Account created! Redirecting…');
+    ui.showFeedback('Account created! Redirecting…');
     setTimeout(() => { window.location.href = 'index.html'; }, 600);
   });
 
-  wireGoogleButton(googleBtn, feedbackEl);
+  wireGoogleButton(googleBtn);
 }
 
 // ============================================================================
@@ -214,7 +195,6 @@ function initForgotPasswordPage() {
   const form = document.getElementById('auth-form');
   const emailInput = document.getElementById('email');
   const emailError = document.getElementById('email-error');
-  const feedbackEl = document.getElementById('feedback');
   const demoNotice = document.getElementById('demo-reset-notice');
   const demoLink = document.getElementById('demo-reset-link');
 
@@ -235,7 +215,7 @@ function initForgotPasswordPage() {
     form.hidden = true;
     // Deliberately doesn't reveal whether the email actually has an account —
     // the reset-password page is what actually rejects unknown emails.
-    showAuthFeedback(feedbackEl, `If an account exists for ${email}, reset instructions have been sent.`);
+    ui.showFeedback(`If an account exists for ${email}, reset instructions have been sent.`);
 
     demoLink.href = `reset-password.html?email=${encodeURIComponent(email)}&token=${token}`;
     demoNotice.hidden = false;
@@ -262,7 +242,6 @@ function initResetPasswordPage() {
   const confirmInput = document.getElementById('confirm-password');
   const confirmError = document.getElementById('confirm-password-error');
   const confirmToggle = document.getElementById('confirm-password-toggle');
-  const feedbackEl = document.getElementById('feedback');
 
   const request = storage.loadResetRequest();
   const linkIsValid = Boolean(
@@ -315,7 +294,7 @@ function initResetPasswordPage() {
     // bounce them straight back to index.html, leaving a stale message.
     const alreadySignedIn = storage.loadSession();
     const destination = alreadySignedIn ? 'index.html' : 'login.html';
-    showAuthFeedback(feedbackEl, alreadySignedIn ? 'Password updated!' : 'Password updated! Redirecting to login…');
+    ui.showFeedback(alreadySignedIn ? 'Password updated!' : 'Password updated! Redirecting to login…');
     setTimeout(() => { window.location.href = destination; }, 900);
   });
 }
@@ -534,6 +513,19 @@ function initNotesApp() {
     archiveNoteLabel.textContent = archived ? 'Unarchive Note' : 'Archive Note';
   }
 
+  /** Toast shown after a note's archived state changes, with a link to jump to where it landed. */
+  function showArchiveToast(archived) {
+    ui.showFeedback(archived ? 'Note archived.' : 'Note restored to active notes.', {
+      action: {
+        label: archived ? 'Archived Notes' : 'All Notes',
+        onClick: () => {
+          state.filter = archived ? 'archived' : 'all';
+          render();
+        },
+      },
+    });
+  }
+
   function selectNote(note) {
     state.selectedId = note.id;
     state.isCreating = false;
@@ -707,11 +699,11 @@ function initNotesApp() {
         noteManager.updateNote(note.id, { location: state.pendingLocation });
       }
       storage.clearDraft();
-      ui.showFeedback('Note saved.');
+      ui.showFeedback('Note saved successfully!');
       selectNote(noteManager.getNotes().find((n) => n.id === note.id));
     } else if (state.selectedId) {
       noteManager.updateNote(state.selectedId, { title, content, tags, folder, location: state.pendingLocation });
-      ui.showFeedback('Note updated.');
+      ui.showFeedback('Note updated successfully!');
       selectNote(noteManager.getNotes().find((n) => n.id === state.selectedId));
     }
   });
@@ -865,7 +857,7 @@ function initNotesApp() {
       const wantsArchived = btn.dataset.filter === 'archived';
       if (Boolean(note.archived) !== wantsArchived) {
         noteManager.toggleArchive(note.id);
-        ui.showFeedback(wantsArchived ? 'Note archived.' : 'Note unarchived.');
+        showArchiveToast(wantsArchived);
         render();
       }
     });
@@ -933,7 +925,7 @@ function initNotesApp() {
   confirmDeleteBtn.addEventListener('click', () => {
     if (state.pendingDeleteId) {
       noteManager.deleteNote(state.pendingDeleteId);
-      ui.showFeedback('Note deleted.');
+      ui.showFeedback('Note permanently deleted.');
       confirmModal.close();
       closeDetail();
     }
@@ -961,9 +953,9 @@ function initNotesApp() {
   archiveConfirmBtn.addEventListener('click', () => {
     if (state.pendingArchiveId) {
       const updated = noteManager.toggleArchive(state.pendingArchiveId);
-      ui.showFeedback(updated.archived ? 'Note archived.' : 'Note unarchived.');
       archiveModal.close();
       selectNote(updated);
+      showArchiveToast(updated.archived);
     }
   });
   archiveModal.addEventListener('close', () => {
@@ -1198,16 +1190,18 @@ function initNotesApp() {
 
   themeSelect.addEventListener('click', (e) => {
     const btn = e.target.closest('.settings-option');
-    if (!btn) return;
+    if (!btn || btn.classList.contains('is-active')) return;
     themes.applyTheme(btn.dataset.value);
     setActiveSegment(themeSelect, btn.dataset.value);
+    ui.showFeedback('Settings updated successfully!');
   });
 
   fontSelect.addEventListener('click', (e) => {
     const btn = e.target.closest('.settings-option');
-    if (!btn) return;
+    if (!btn || btn.classList.contains('is-active')) return;
     themes.applyFont(btn.dataset.value);
     setActiveSegment(fontSelect, btn.dataset.value);
+    ui.showFeedback('Settings updated successfully!');
   });
 
   // ---------------------------------------------------------------------
