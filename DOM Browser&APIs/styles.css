@@ -506,6 +506,11 @@ svg {
   background: var(--surface);
 }
 
+.search-box:focus-within {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
 .search-icon {
   color: var(--ink-faint);
 }
