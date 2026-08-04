@@ -1,8 +1,3 @@
-/**
- * Core business logic: add, edit, delete, and filter journal entries.
- * All state mutation flows through JournalStore, which keeps the
- * in-memory Journal and localStorage in sync.
- */
 import { loadJournal, saveJournal } from "./storage.js";
 import { findByProperty, generateId } from "./utils.js";
 export class JournalStore {
@@ -22,12 +17,6 @@ export class JournalStore {
     getAll() {
         return [...this.journal];
     }
-    /**
-     * Creates a new entry. `partial` is intentionally Partial<JournalEntry> —
-     * strict mode then forces us to validate title/content/mood are actually
-     * present before we can hand back a real JournalEntry, so a caller can
-     * never smuggle an incomplete object past this boundary.
-     */
     addEntry(partial) {
         if (!partial.title || !partial.title.trim()) {
             throw new Error("An entry requires a non-empty title.");
