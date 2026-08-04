@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Journal — Reflect, Track, Grow</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="app-header__inner">
+      <span class="app-header__icon" aria-hidden="true">📔</span>
+      <div>
+        <h1 class="app-header__title">Journal</h1>
+        <p class="app-header__subtitle">Reflect on your day, one entry at a time</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="compose-card" aria-labelledby="form-heading">
+      <h2 id="form-heading" class="compose-card__heading">New entry</h2>
+      <form id="entry-form" novalidate>
+        <div class="form-field">
+          <label for="entry-title">Title</label>
+          <input
+            id="entry-title"
+            name="title"
+            type="text"
+            placeholder="Give your entry a title…"
+            maxlength="80"
+            required
+          />
+        </div>
+
+        <div class="form-field">
+          <label for="entry-content">What's on your mind?</label>
+          <textarea
+            id="entry-content"
+            name="content"
+            rows="5"
+            placeholder="Write freely — no judgment here."
+            maxlength="4000"
+          ></textarea>
+          <span id="char-count" class="char-count">0 characters</span>
+        </div>
+
+        <div class="form-field">
+          <span class="form-field__label-text" id="mood-selector-label">Mood</span>
+          <div id="mood-selector" class="mood-selector" role="group" aria-labelledby="mood-selector-label"></div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" id="cancel-edit-button" class="button button--ghost" hidden>Cancel</button>
+          <button type="submit" id="submit-button" class="button button--primary">Save entry</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="stats-bar" class="stats-bar" aria-live="polite" hidden></section>
+
+    <section class="filters" aria-label="Filter entries">
+      <div class="form-field form-field--inline">
+        <label for="mood-filter">Filter by mood</label>
+        <select id="mood-filter">
+          <option value="">All moods</option>
+        </select>
+      </div>
+      <div class="form-field form-field--inline">
+        <label for="search-input">Search</label>
+        <input id="search-input" type="search" placeholder="Search title or content…" />
+      </div>
+    </section>
+
+    <section aria-label="Journal entries">
+      <div id="entries-list" class="entries-list"></div>
+      <div id="empty-state" class="empty-state" hidden>
+        <span class="empty-state__icon" aria-hidden="true">🌱</span>
+        <p class="empty-state__title">No entries yet</p>
+        <p class="empty-state__hint">Write your first journal entry above to get started.</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast-container" class="toast-container" aria-live="assertive"></div>
+
+  <script type="module" src="./dist/main.js"></script>
+</body>
+</html>
