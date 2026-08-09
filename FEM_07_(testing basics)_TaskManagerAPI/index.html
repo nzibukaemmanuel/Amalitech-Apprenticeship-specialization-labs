@@ -3,67 +3,70 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="stylesheet" href="./styles.css" />
 <title>Task Manager</title>
 </head>
 <body>
-  <header>
-    <h1>Task Manager</h1>
-    <span id="status">Loading…</span>
-    <button id="reload-btn" class="secondary" style="margin-left:auto">Reload data</button>
-  </header>
+  <div class="app-window">
+    <div class="chrome-bar">
+      <div class="chrome-title">Task Manager</div>
+      <div class="chrome-status" id="status">Loading…</div>
+    </div>
 
-  <main>
-    <section class="panel">
-      <h2>Statistics</h2>
-      <div id="stats-grid"></div>
-      <div id="priority-breakdown"></div>
-    </section>
+    <div class="app-body">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <span class="brand-mark">◐</span>
+          <span class="brand-name">Task Manager</span>
+        </div>
 
-    <section class="panel">
-      <h2>Filters</h2>
-      <div class="controls">
-        <input id="search-input" type="search" placeholder="Search titles…" />
-        <select id="status-filter">
-          <option value="all">All statuses</option>
-          <option value="completed">Completed</option>
-          <option value="pending">Pending</option>
-        </select>
-        <select id="user-filter">
-          <option value="all">All users</option>
-        </select>
-        <select id="sort-select">
-          <option value="none">Unsorted</option>
-          <option value="priority">Priority (desc), then title</option>
-          <option value="title">Title (A–Z)</option>
-          <option value="completed">Pending first</option>
-        </select>
-        <button id="export-btn" class="secondary">Export JSON</button>
-      </div>
-      <div id="export-output"></div>
-    </section>
+        <div class="sidebar-label">Users</div>
+        <nav class="user-nav" id="user-nav">
+          <!-- populated by app.js: one .user-item per user, plus "All users" -->
+        </nav>
 
-    <section class="panel">
-      <div id="task-count"></div>
-      <div class="overflow" id="table-scroll">
-        <table>
-          <thead>
-            <tr><th>#</th><th>Title</th><th>User</th><th>Priority</th><th>Status</th><th>Due</th><th></th></tr>
-          </thead>
-          <tbody id="task-rows"></tbody>
-        </table>
-      </div>
-    </section>
+        <div class="sidebar-footer">
+          <button id="rate-limit-btn" class="ghost-btn" title="Fetch each user's todos individually, capped at 3 concurrent requests">
+            <span class="ghost-icon">⚡</span> Rate-limited fetch
+          </button>
+          <button id="reload-btn" class="ghost-btn">
+            <span class="ghost-icon">⟳</span> Reload data
+          </button>
+        </div>
+      </aside>
 
-    <section class="panel">
-      <h2>Rate-limited fetch demo</h2>
-      <p style="color:var(--muted); font-size:0.85rem; margin:0 0 0.5rem">
-        Fetches each user's todos individually (bonus <code>fetchTodosForUsers</code>), capped at 3 concurrent requests instead of firing all of them via <code>Promise.all()</code>.
-      </p>
-      <button id="rate-limit-btn" class="secondary">Fetch todos per user</button>
-      <div id="rate-limit-output"></div>
-    </section>
-  </main>
+      <main class="main">
+        <div class="stats-row" id="stats-grid"></div>
+        <div class="priority-line" id="priority-breakdown"></div>
+
+        <div class="status-tabs" id="status-tabs">
+          <button class="tab active" data-status="all">All</button>
+          <button class="tab" data-status="pending">Pending</button>
+          <button class="tab" data-status="completed">Completed</button>
+        </div>
+
+        <div class="task-scroll" id="table-scroll">
+          <div class="task-count" id="task-count"></div>
+          <div class="task-list" id="task-rows"></div>
+        </div>
+
+        <div class="output-line" id="export-output"></div>
+        <div class="output-line" id="rate-limit-output"></div>
+      </main>
+    </div>
+
+    <div class="float-bar">
+      <input id="search-input" type="search" placeholder="Search tasks…" />
+      <select id="sort-select">
+        <option value="none">Unsorted</option>
+        <option value="priority">Priority, then title</option>
+        <option value="title">Title (A–Z)</option>
+        <option value="completed">Pending first</option>
+      </select>
+      <button id="export-btn" class="accent-btn">Export JSON</button>
+    </div>
+  </div>
 
   <script type="module" src="./app.js"></script>
 </body>
