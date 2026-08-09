@@ -26,6 +26,106 @@ const state = {
   userId: 'all'
 };
 
+// Replaces a native <select> with a styled combobox so the dropdown panel
+// can match the app's own dark theme instead of the OS/browser's native popup.
+function enhanceSelect(select) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'custom-select';
+
+  const trigger = document.createElement('button');
+  trigger.type = 'button';
+  trigger.className = 'custom-select-trigger';
+  trigger.setAttribute('aria-haspopup', 'listbox');
+  trigger.setAttribute('aria-expanded', 'false');
+
+  const valueSpan = document.createElement('span');
+  valueSpan.className = 'custom-select-value';
+
+  const chevron = document.createElement('span');
+  chevron.className = 'custom-select-chevron';
+  chevron.setAttribute('aria-hidden', 'true');
+
+  trigger.append(valueSpan, chevron);
+
+  const panel = document.createElement('ul');
+  panel.className = 'custom-select-panel';
+  panel.setAttribute('role', 'listbox');
+  panel.hidden = true;
+
+  const openPanel = () => {
+    panel.hidden = false;
+    trigger.setAttribute('aria-expanded', 'true');
+  };
+
+  const closePanel = () => {
+    panel.hidden = true;
+    trigger.setAttribute('aria-expanded', 'false');
+  };
+
+  const syncSelected = () => {
+    valueSpan.textContent = select.options[select.selectedIndex]?.textContent ?? '';
+    options.forEach((li) => {
+      li.setAttribute('aria-selected', String(li.dataset.value === select.value));
+    });
+  };
+
+  const options = [...select.options].map((opt) => {
+    const li = document.createElement('li');
+    li.className = 'custom-select-option';
+    li.setAttribute('role', 'option');
+    li.tabIndex = 0;
+    li.dataset.value = opt.value;
+    li.textContent = opt.textContent;
+
+    const choose = () => {
+      select.value = opt.value;
+      select.dispatchEvent(new Event('input', { bubbles: true }));
+      syncSelected();
+      closePanel();
+      trigger.focus();
+    };
+
+    li.addEventListener('click', choose);
+    li.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        choose();
+      }
+    });
+
+    panel.appendChild(li);
+    return li;
+  });
+
+  trigger.addEventListener('click', () => (panel.hidden ? openPanel() : closePanel()));
+
+  trigger.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      openPanel();
+      (event.key === 'ArrowDown' ? options[0] : options[options.length - 1])?.focus();
+    }
+  });
+
+  wrapper.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closePanel();
+      trigger.focus();
+    }
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!wrapper.contains(event.target)) closePanel();
+  });
+
+  syncSelected();
+  wrapper.append(trigger, panel);
+  select.insertAdjacentElement('afterend', wrapper);
+  select.tabIndex = -1;
+  select.setAttribute('aria-hidden', 'true');
+  select.classList.add('visually-hidden-select');
+}
+
 function setStatus(message, isError = false) {
   const el = $('status');
   el.textContent = message;
@@ -151,6 +251,7 @@ async function loadData() {
 
 searchInput.addEventListener('input', applyFilters);
 sortSelect.addEventListener('input', applyFilters);
+enhanceSelect(sortSelect);
 
 statusTabs.addEventListener('click', (event) => {
   const tab = event.target.closest('.tab');
