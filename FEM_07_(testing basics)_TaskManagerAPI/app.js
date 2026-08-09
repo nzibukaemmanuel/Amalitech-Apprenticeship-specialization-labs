@@ -8,9 +8,9 @@ const manager = new TaskManager();
 
 const $ = (id) => document.getElementById(id);
 const searchInput = $('search-input');
-const statusFilter = $('status-filter');
-const userFilter = $('user-filter');
 const sortSelect = $('sort-select');
+const userNav = $('user-nav');
+const statusTabs = $('status-tabs');
 
 const SORTERS = {
   none: [],
@@ -19,10 +19,27 @@ const SORTERS = {
   completed: [processor.byCompletedFirst]
 };
 
+// UI-only filter state — replaces the old <select> elements with a sidebar
+// user list and a row of status tabs, both driven from plain variables.
+const state = {
+  status: 'all',
+  userId: 'all'
+};
+
 function setStatus(message, isError = false) {
   const el = $('status');
   el.textContent = message;
-  el.style.color = isError ? 'var(--overdue)' : '';
+  el.classList.toggle('is-error', isError);
+}
+
+function initials(name = '') {
+  return name
+    .split(' ')
+    .map((part) => part[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
 }
 
 function renderStats() {
@@ -44,11 +61,27 @@ function renderStats() {
     `By priority — ${Object.entries(byPriority).map(([k, v]) => `${k}: ${v}`).join(', ')}`;
 }
 
-function populateUserFilter() {
-  const options = manager.getUserList()
-    .map(({ id, name }) => `<option value="${id}">${name}</option>`)
-    .join('');
-  userFilter.innerHTML = `<option value="all">All users</option>${options}`;
+function renderUserNav() {
+  const users = manager.getUserList();
+  const allCount = manager.tasks.length;
+
+  const allItem = `
+    <button class="user-item ${state.userId === 'all' ? 'active' : ''}" data-user="all">
+      <span class="avatar">All</span>
+      <span class="user-name">All users</span>
+      <span class="user-count">${allCount}</span>
+    </button>
+  `;
+
+  const userItems = users.map((user) => `
+    <button class="user-item ${String(state.userId) === String(user.id) ? 'active' : ''}" data-user="${user.id}">
+      <span class="avatar">${initials(user.name)}</span>
+      <span class="user-name">${user.name}</span>
+      <span class="user-count">${user.tasks.length}</span>
+    </button>
+  `).join('');
+
+  userNav.innerHTML = allItem + userItems;
 }
 
 function statusBadge(task) {
@@ -62,25 +95,31 @@ function renderTasks(tasks) {
   $('task-rows').innerHTML = tasks.map((task) => {
     const user = manager.users.get(task.userId);
     const { cls, label } = statusBadge(task);
+    const isOverdue = cls === 'status-overdue';
     const due = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '—';
     return `
-      <tr data-id="${task.id}">
-        <td>${task.id}</td>
-        <td>${task.title}</td>
-        <td>${user?.name ?? task.userId}</td>
-        <td>${task.priority}</td>
-        <td><span class="status-badge ${cls}">${label}</span></td>
-        <td>${due}</td>
-        <td class="row-actions"><button class="secondary toggle-btn" data-id="${task.id}">Toggle</button></td>
-      </tr>
+      <article class="task-card ${task.completed ? 'is-completed' : ''} ${isOverdue ? 'is-overdue' : ''}" data-id="${task.id}">
+        <div class="task-main">
+          <div class="task-title">${task.title}</div>
+          <div class="task-meta">
+            <span>${user?.name ?? `User ${task.userId}`}</span>
+            <span>${task.priority} priority</span>
+            <span>Due ${due}</span>
+          </div>
+        </div>
+        <div class="task-side">
+          <span class="status-badge ${cls}">${label}</span>
+          <button class="toggle-btn" data-id="${task.id}">Toggle</button>
+        </div>
+      </article>
     `;
   }).join('');
 }
 
 function applyFilters() {
-  let tasks = processor.filterByStatus(manager.tasks, statusFilter.value);
-  if (userFilter.value !== 'all') {
-    tasks = processor.filterByUser(tasks, Number(userFilter.value));
+  let tasks = processor.filterByStatus(manager.tasks, state.status);
+  if (state.userId !== 'all') {
+    tasks = processor.filterByUser(tasks, Number(state.userId));
   }
   tasks = processor.searchTasks(tasks, searchInput.value);
   tasks = processor.sortTasks(tasks, ...SORTERS[sortSelect.value]);
@@ -101,7 +140,7 @@ async function loadData() {
   setStatus('Loading users and todos from JSONPlaceholder…');
   try {
     await manager.load();
-    populateUserFilter();
+    renderUserNav();
     renderStats();
     applyFilters();
     setStatus(`Loaded ${manager.getUserList().length} users and ${manager.tasks.length} tasks.`);
@@ -110,9 +149,24 @@ async function loadData() {
   }
 }
 
-[searchInput, statusFilter, userFilter, sortSelect].forEach((el) =>
-  el.addEventListener('input', applyFilters)
-);
+searchInput.addEventListener('input', applyFilters);
+sortSelect.addEventListener('input', applyFilters);
+
+statusTabs.addEventListener('click', (event) => {
+  const tab = event.target.closest('.tab');
+  if (!tab) return;
+  state.status = tab.dataset.status;
+  [...statusTabs.querySelectorAll('.tab')].forEach((el) => el.classList.toggle('active', el === tab));
+  applyFilters();
+});
+
+userNav.addEventListener('click', (event) => {
+  const item = event.target.closest('.user-item');
+  if (!item) return;
+  state.userId = item.dataset.user;
+  renderUserNav();
+  applyFilters();
+});
 
 $('reload-btn').addEventListener('click', loadData);
 
@@ -121,6 +175,7 @@ $('task-rows').addEventListener('click', (event) => {
   if (!button) return;
   const task = manager.tasks.find((t) => t.id === Number(button.dataset.id));
   task?.toggle();
+  renderUserNav();
   renderStats();
   applyFilters();
 });
@@ -137,7 +192,7 @@ $('export-btn').addEventListener('click', () => {
 });
 
 $('rate-limit-btn').addEventListener('click', async (event) => {
-  const button = event.target;
+  const button = event.target.closest('button');
   const output = $('rate-limit-output');
   button.disabled = true;
   output.textContent = 'Fetching todos per user with concurrency capped at 3…';

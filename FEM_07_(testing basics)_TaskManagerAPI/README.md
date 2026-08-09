@@ -85,6 +85,15 @@ exports the current data as a downloaded JSON file (client-side, via `Blob`
 — no server round-trip); and has a button to run the rate-limited
 `fetchTodosForUsers()` demo, showing the elapsed time and per-user counts.
 
+**UI:** a dark, minimalist shell styled like a native macOS app window —
+a chrome bar with traffic-light dots, a sidebar listing each user (click one
+to filter, mirroring the old `<select>`), status tabs (All/Pending/Completed),
+tasks rendered as rounded cards rather than table rows, and a floating,
+glass-blurred bar at the bottom for search/sort/export. Deep charcoal
+surfaces (`#0d0d0d`–`#202020`), 1px `#2a2a2a` borders, `Inter` typography,
+and a single restrained accent (`#6e8bff`) used only for active/focus states
+— no gradients, no bright colors.
+
 `src/main.js`'s `TaskManager` class was extracted into `src/taskManager.js`
 specifically to make this possible: it has no Node-specific dependencies
 (no `node:fs`, no `node:readline`), so it runs unchanged in a browser. The
