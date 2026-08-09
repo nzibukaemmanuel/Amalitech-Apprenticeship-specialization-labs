@@ -16,6 +16,7 @@ import { TaskManager } from '../../src/taskManager.js';
 import { APIError } from '../../src/errors.js';
 import { exportToJSON } from '../../src/exporter.js';
 import { calculateStatistics } from '../../src/taskProcessor.js';
+import { MockAPIClient, mockUsers as sharedMockUsers, mockTodos as sharedMockTodos } from '../__mocks__/api.js';
 import { readFile, unlink } from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
@@ -170,6 +171,19 @@ describe('Complete data-flow workflows (TaskManager end-to-end)', () => {
     const todosByUser = await manager.fetchTodosPerUser(); // no argument at all
     expect(todosByUser.get(1)).toHaveLength(2);
     expect(todosByUser.get(2)).toHaveLength(1);
+  });
+
+  it('Workflow 7: TaskManager works end-to-end with MockAPIClient injected via its constructor, no fetch mocking at all', async () => {
+    // Unlike every workflow above (which mocks the global fetch), this test
+    // swaps in the tests/__mocks__/api.js stunt-double directly — proving
+    // TaskManager's constructor-injection actually works, not just its
+    // fetch-based code path.
+    const manager = new TaskManager(new MockAPIClient());
+    await manager.load();
+
+    expect(manager.tasks).toHaveLength(sharedMockTodos.length);
+    expect(manager.getUserList()).toHaveLength(sharedMockUsers.length);
+    expect(manager.getStatistics()).toEqual(calculateStatistics(manager.tasks));
   });
 
   it('exportToJSON() falls back to safe empty defaults when called with no data object at all', async () => {

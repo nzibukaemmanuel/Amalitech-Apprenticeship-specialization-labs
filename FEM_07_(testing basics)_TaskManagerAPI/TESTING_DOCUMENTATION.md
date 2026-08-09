@@ -35,16 +35,16 @@ This document explains, in plain language wherever possible, how this project wa
 
 **Rationale for test selection:** the model classes and `taskProcessor` functions hold this project's actual business rules (what counts as overdue, how completion rate rounds, how multi-criteria sorting resolves ties), so they got the deepest coverage. The cache and rate limiter are less "business logic" and more "infrastructure," but they have subtle correctness requirements (never exceed the concurrency limit, never call the wrapped function twice for the same key) that are easy to break silently, so they were tested just as thoroughly.
 
-### Integration Tests (29 test cases)
+### Integration Tests (30 test cases)
 
 | File | Module interactions tested |
 |---|---|
 | `tests/integration/api.test.js` | `APIClient` (with its real private `#request`/`#fetchUsersRaw` methods) talking to a mocked global `fetch` — success responses, 404/500 errors, dead network connections, malformed JSON, non-array response bodies, the built-in per-endpoint caching, `fetchAll()`'s `Promise.all` concurrency, the plain-Promise-chain `fetchUsersPromiseStyle()` variant, and the rate-limited `fetchTodosForUsers()` |
-| `tests/integration/dataFlow.test.js` | Complete workflows through `TaskManager`: mocked API → real `PriorityTask`/`User` objects → `taskProcessor` functions → final output, including a real file written to disk via `exportToJSON()` |
+| `tests/integration/dataFlow.test.js` | Complete workflows through `TaskManager`: mocked API → real `PriorityTask`/`User` objects → `taskProcessor` functions → final output, including a real file written to disk via `exportToJSON()`, and one workflow that swaps in `MockAPIClient` via constructor injection instead of mocking `fetch` |
 
-**Mocking strategy:** tests never touch the real internet. `global.fetch` was replaced with `jest.fn()`, and we scripted exactly what it should return (`mockResolvedValue`, or a custom implementation keyed off the requested URL) or fail with (`mockRejectedValue`) for each scenario. A separate `tests/__mocks__/api.js` provides realistic sample user/todo data and a `MockAPIClient` matching the real `APIClient`'s method names, for use in future workflow tests.
+**Mocking strategy:** tests never touch the real internet. Most tests replace `global.fetch` with `jest.fn()` and script exactly what it should return (`mockResolvedValue`, or a custom implementation keyed off the requested URL) or fail with (`mockRejectedValue`). A separate `tests/__mocks__/api.js` provides realistic sample user/todo data and a `MockAPIClient` matching the real `APIClient`'s method names; Workflow 7 in `dataFlow.test.js` injects it straight into `TaskManager`'s constructor, proving the dependency-injection path itself works — not just the fetch-mocking path every other test relies on.
 
-**Complete workflows tested (8, across `dataFlow.test.js`):**
+**Complete workflows tested (9, across `dataFlow.test.js`):**
 1. `load()` fetches users+todos and correctly attaches each todo to its owning `User`.
 2. `getStatistics()` on real loaded data matches calling `calculateStatistics()` directly.
 3. `search()` and `getTasksByUser()` work correctly against real `PriorityTask` instances built from API data.
@@ -52,7 +52,8 @@ This document explains, in plain language wherever possible, how this project wa
 5. A full pipeline from mocked API through `exportToJSON()` to a real JSON file on disk, then read back and verified.
 6. `fetchTodosPerUser()` (the rate-limited bonus feature) driven end-to-end from real loaded users, with an explicit concurrency value.
 6b. The same feature falling back correctly to its default concurrency of 3 when called with no arguments.
-7. `exportToJSON()` falling back to safe empty defaults when called with no data object at all.
+7. `TaskManager` driven end-to-end via `MockAPIClient` injected into its constructor — no `fetch` mocking at all.
+8. `exportToJSON()` falling back to safe empty defaults when called with no data object at all.
 
 ### Mocks & Spies
 
@@ -87,7 +88,7 @@ All files         |     100 |      100 |     100 |     100 |
  taskProcessor.js |     100 |      100 |     100 |     100 |
 
 Test Suites: 6 passed, 6 total
-Tests:       142 passed, 142 total
+Tests:       143 passed, 143 total
 ```
 
 **Overall coverage vs. targets:**
@@ -189,11 +190,11 @@ TaskManagerAPI/
     │   └── utils.test.js              # NEW - 26 tests (includes 10 spy-based tests)
     ├── integration/
     │   ├── api.test.js                # NEW - 21 tests
-    │   └── dataFlow.test.js           # NEW - 8 tests
+    │   └── dataFlow.test.js           # NEW - 9 tests (incl. one using MockAPIClient via DI)
     └── __mocks__/
-        └── api.js                     # NEW - sample data + MockAPIClient for future use
+        └── api.js                     # NEW - sample data + MockAPIClient, used by dataFlow.test.js
 ```
 
-**Total: 142 new Jest test cases, all passing, 100% coverage on every tested source file.**
+**Total: 143 new Jest test cases, all passing, 100% coverage on every tested source file.**
 
 No source files in `src/` were modified — every test was written against the project exactly as it already existed.
