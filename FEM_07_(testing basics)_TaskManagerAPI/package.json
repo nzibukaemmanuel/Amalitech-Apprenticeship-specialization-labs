@@ -1,0 +1,19 @@
+{
+  "name": "fem_07_(testing-basics)_taskmanagerapi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "jest": "^30.4.2"
+  },
+  "allowScripts": {
+    "unrs-resolver@1.12.2": true
+  }
+}
