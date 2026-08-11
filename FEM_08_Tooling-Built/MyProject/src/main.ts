@@ -9,7 +9,7 @@ const categories = [
 let activeCategory = 'All';
 let query = '';
 
-const app = document.querySelector<HTMLDivElement>('#app')!;
+const app = document.querySelector<HTMLElement>('#app')!;
 
 app.innerHTML = `
   <header class="dashboard-header">
