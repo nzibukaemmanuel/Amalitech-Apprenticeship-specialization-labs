@@ -21,3 +21,5 @@ export default defineConfig([
 
   prettier,
 ]);
+
+//This tells ESLint to check JavaScript and TypeScript files and use recommended rules.
