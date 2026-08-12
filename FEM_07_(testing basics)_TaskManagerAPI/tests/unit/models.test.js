@@ -12,7 +12,7 @@
  * separate positional arguments - so every test below constructs
  * objects that way to match the real source code in src/models.js.
  */
-
+1
 import { Task, PriorityTask, User } from '../../src/models.js';
 
 describe('Task', () => {
