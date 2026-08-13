@@ -287,6 +287,21 @@ describe("showToast", () => {
 
     expect(document.querySelector(".toast--error")!.textContent).toBe("Oops");
   });
+
+  it("marks the toast as leaving after the delay and removes it once the animation ends", () => {
+    vi.useFakeTimers();
+    setupUI(makeCallbacks());
+    showToast("Saved!");
+    const toast = document.querySelector(".toast--success")!;
+
+    vi.advanceTimersByTime(2600);
+    expect(toast.classList.contains("toast--leaving")).toBe(true);
+
+    toast.dispatchEvent(new Event("animationend"));
+    expect(document.querySelector(".toast--success")).toBeNull();
+
+    vi.useRealTimers();
+  });
 });
 
 describe("resetForm", () => {

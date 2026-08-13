@@ -8,7 +8,8 @@
     "watch": "tsc --watch",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +17,7 @@
   "type": "commonjs",
   "devDependencies": {
     "@types/node": "^26.1.2",
+    "@vitest/coverage-v8": "^4.1.10",
     "jsdom": "^30.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^7.0.2",
