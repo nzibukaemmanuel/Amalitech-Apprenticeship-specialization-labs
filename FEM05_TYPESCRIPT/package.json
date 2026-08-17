@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
+    "dev": "vite",
     "watch": "tsc --watch",
     "test": "vitest",
     "test:run": "vitest run",
@@ -21,6 +22,7 @@
     "jsdom": "^30.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^7.0.2",
+    "vite": "^8.2.0",
     "vitest": "^4.1.10"
   }
 }
