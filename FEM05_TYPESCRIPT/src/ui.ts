@@ -251,7 +251,7 @@ function buildEntryCard(entry: JournalEntry): HTMLElement {
   return card;
 }
 
-/** Renders the total-entries / most-frequent-mood statistics bar. */
+/** Renders the total-entries / most-frequent-mood statistics bar. if no data is available, hides the bar. */
 export function renderStats(stats: JournalStats): void {
   if (stats.total === 0) {
     statsBar.innerHTML = "";
