@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1786558301856" clover="3.2.0">
-  <project timestamp="1786558301856" name="All files">
+<coverage generated="1787148780349" clover="3.2.0">
+  <project timestamp="1787148780349" name="All files">
     <metrics statements="177" coveredstatements="177" conditionals="86" coveredconditionals="86" methods="75" coveredmethods="75" elements="338" coveredelements="338" complexity="0" loc="177" ncloc="177" packages="1" files="8" classes="8"/>
     <file name="api.js" path="C:\Users\Amalitech\Desktop\LABS\Amalitech-Apprenticeship-specialization-labs\FEM_07_(testing basics)_TaskManagerAPI\src\api.js">
       <metrics statements="36" coveredstatements="36" conditionals="15" coveredconditionals="15" methods="11" coveredmethods="11"/>

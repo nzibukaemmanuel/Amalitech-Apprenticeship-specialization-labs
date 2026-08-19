@@ -10,7 +10,7 @@
     "preview": "node server.js",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage --watch",
+    "test:coverage": "jest --coverage",
     "test:legacy": "node tests/smoke-test.js && node tests/integration-test.js"
   },
   "engines": {
